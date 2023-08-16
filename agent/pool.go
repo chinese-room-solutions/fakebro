@@ -12,6 +12,7 @@ var NilPool = errors.New("pool is closed or not initialized")
 type ActiveAgentPool struct {
 	ActiveAgents chan *ActiveAgent
 	Agents       []*Agent
+	Network      string
 	Address      string
 	DialTimeout  time.Duration
 	Condition    func(*Agent) bool
@@ -24,15 +25,17 @@ type ActiveAgentPool struct {
 // NewActiveAgentPool creates a new active agent pool.
 // address is the address of the server.
 // dialTimeout is the timeout for dialing the server.
-// condition is the condition for selecting agents.
 // limit is the maximum number of active agents.
+// condition is the condition for selecting agents.
 func NewActiveAgentPool(
+	network string,
 	address string,
 	dialTimeout time.Duration,
-	condition func(*Agent) bool,
 	limit int,
+	condition func(*Agent) bool,
 ) *ActiveAgentPool {
 	p := ActiveAgentPool{
+		Network:     network,
 		Address:     address,
 		DialTimeout: dialTimeout,
 		Condition:   condition,
@@ -55,7 +58,6 @@ func (p *ActiveAgentPool) Roll() {
 
 // Get an active agent from the pool.
 func (p *ActiveAgentPool) Get() (*ActiveAgent, error) {
-	var err error
 	var aa *ActiveAgent
 	if p.ActiveAgents == nil {
 		return nil, NilPool
@@ -63,11 +65,8 @@ func (p *ActiveAgentPool) Get() (*ActiveAgent, error) {
 	if len(p.ActiveAgents) == 0 && p.Size < p.Limit {
 		p.lock.Lock()
 		defer p.lock.Unlock()
-		aa, err = NewActiveAgent(p.Agents[p.Index], p.Address, p.DialTimeout)
+		aa = NewActiveAgent(p.Agents[p.Index])
 		p.Index = (p.Index + 1) % len(p.Agents)
-		if err != nil {
-			return nil, err
-		}
 		p.Size++
 		return aa, nil
 	} else {
@@ -78,6 +77,7 @@ func (p *ActiveAgentPool) Get() (*ActiveAgent, error) {
 
 // Put an active agent back to the pool.
 // To delete an active agent, just don't put it back and decrement the pool size.
+// Don't put an active agent back to the pool if it is not created by the pool as it may lead to deadlock.
 func (p *ActiveAgentPool) Put(aa *ActiveAgent) error {
 	select {
 	case p.ActiveAgents <- aa:
@@ -91,10 +91,10 @@ func (p *ActiveAgentPool) Put(aa *ActiveAgent) error {
 func (p *ActiveAgentPool) Close() {
 	if p.ActiveAgents != nil {
 		p.Index = 0
+		close(p.ActiveAgents)
 		for aa := range p.ActiveAgents {
 			aa.Stop()
 		}
-		close(p.ActiveAgents)
 		p.ActiveAgents = nil
 	}
 }

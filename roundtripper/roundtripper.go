@@ -1,7 +1,6 @@
 package roundtripper
 
 import (
-	"crypto/tls"
 	"net/http"
 	"time"
 
@@ -15,14 +14,15 @@ type RoundTripper struct {
 }
 
 func New(
+	network string,
 	address string,
 	dialTimeout time.Duration,
-	condition func(*agent.Agent) bool,
 	limit int,
+	condition func(*agent.Agent) bool,
 	headers map[string]string,
 ) *RoundTripper {
 	return &RoundTripper{
-		Pool:    agent.NewActiveAgentPool(address, dialTimeout, condition, limit),
+		Pool:    agent.NewActiveAgentPool(network, address, dialTimeout, limit, condition),
 		Headers: headers,
 	}
 }
@@ -36,19 +36,12 @@ func (rt *RoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 
 	// Merge the custom headers with the agent headers with the precedence of the custom headers
 	headers := map[string]string{}
-	maps.Copy(&headers, a.Headers)
-	maps.Copy(&headers, rt.Headers)
+	maps.Copy(headers, a.Headers)
+	maps.Copy(headers, rt.Headers)
 
 	for header, value := range headers {
 		r.Header.Set(header, value)
 	}
 
-	transport := &http.Transport{
-		DialTLS: a.GetConnection,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true, // this is insecure; only use if you know what you're doing
-		},
-	}
-
-	return rt.inner.RoundTrip(r)
+	return a.T.RoundTrip(r)
 }
