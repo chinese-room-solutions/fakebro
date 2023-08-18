@@ -10,16 +10,16 @@ import (
 var NilPool = errors.New("pool is closed or not initialized")
 
 type ActiveAgentPool struct {
-	ActiveAgents chan *ActiveAgent
-	Agents       []*Agent
-	Network      string
-	Address      string
-	DialTimeout  time.Duration
-	Condition    func(*Agent) bool
-	Limit        int
-	Size         int
-	Index        int
-	lock         sync.Mutex
+	Agents      chan *Agent
+	Roller      *Roller
+	Network     string
+	Address     string
+	DialTimeout time.Duration
+	Condition   func(*Agent) bool
+	Limit       int
+	Size        int
+	Index       int
+	lock        sync.Mutex
 }
 
 // NewActiveAgentPool creates a new active agent pool.

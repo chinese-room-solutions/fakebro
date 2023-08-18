@@ -9,6 +9,23 @@ import (
 	tls "github.com/refraction-networking/utls"
 )
 
+type BaseTLSConfig struct {
+	Client   string
+	Versions []string
+	Value    *tls.ClientHelloSpec
+}
+
+type TLSConfig struct {
+	Client  string
+	Version string
+	Value   *tls.ClientHelloSpec
+}
+
+type IdentityHeaders struct {
+	IntFunc func(...interface{}) string
+	Headers []map[string]string
+}
+
 var BaseHeaders = map[string]map[string]string{
 	"firefox": {
 		"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -23,28 +40,26 @@ var BaseHeaders = map[string]map[string]string{
 	},
 }
 
-var BaseTLSConfigs = map[string]*tls.ClientHelloSpec{}
+var IdentityHeadersPool = map[string][]map[string]string{
+	"firefox": {
+		{"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:%s) Gecko/20100101 Firefox/%s"},
+		{"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1; rv:%s) Gecko/20100101 Firefox/%s"},
+		{"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_6_2; rv:%s) Gecko/20100101 Firefox/%s"},
+		{"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_1_0; rv:%s) Gecko/20100101 Firefox/%s"},
+		{"User-Agent": "Mozilla/5.0 (Android; Mobile; rv:%s) Gecko/20100101 Firefox/%s"},
+		{"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/%s Mobile/15E148 Safari/605.1.15"},
+		{"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/%s Mobile/15E148 Safari/605.1.15"},
+		{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:%s) Gecko/20100101 Firefox/%s"},
+	},
+}
 
-// Predefined list of user agents.
+// BaseTLSConfigs is a list of TLS configs that are used to make TLS connections.
 // Borrowed from: https://github.com/refraction-networking/utls/blob/8199306255caf0d870f69cb36f6b440b33dbf7c5/u_parrots.go
-var Agents = []*Agent{
+var BaseTLSConfigs = []*BaseTLSConfig{
 	{
-		Name:    "firefox",
-		Version: 99,
-		Headers: map[string]string{
-			"Host":                      "indeed.com",
-			"User-Agent":                "Mozilla/5.0 (X11; Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0",
-			"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-			"Accept-Language":           "en-US,en;q=0.5",
-			"DNT":                       "1",
-			"Upgrade-Insecure-Requests": "1",
-			"Connection":                "keep-alive",
-			"Sec-Fetch-Dest":            "document",
-			"Sec-Fetch-Mode":            "navigate",
-			"Sec-Fetch-Site":            "none",
-			"Sec-Fetch-User":            "?1",
-		},
-		TLSConfig: &tls.ClientHelloSpec{
+		Client:   "firefox",
+		Versions: []string{"99.0"},
+		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS10,
 			TLSVersMax: tls.VersionTLS13,
 			CipherSuites: []uint16{
@@ -140,22 +155,9 @@ var Agents = []*Agent{
 		},
 	},
 	{
-		Name:    "firefox",
-		Version: 102,
-		Headers: map[string]string{
-			"Host":                      "indeed.com",
-			"User-Agent":                "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
-			"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-			"Accept-Language":           "en-US,en;q=0.5",
-			"DNT":                       "1",
-			"Upgrade-Insecure-Requests": "1",
-			"Connection":                "keep-alive",
-			"Sec-Fetch-Dest":            "document",
-			"Sec-Fetch-Mode":            "navigate",
-			"Sec-Fetch-Site":            "none",
-			"Sec-Fetch-User":            "?1",
-		},
-		TLSConfig: &tls.ClientHelloSpec{
+		Client:   "firefox",
+		Versions: []string{"102.0"},
+		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS10,
 			TLSVersMax: tls.VersionTLS13,
 			CipherSuites: []uint16{
@@ -178,7 +180,7 @@ var Agents = []*Agent{
 				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
 			},
 			CompressionMethods: []byte{
-				0,
+				0x0,
 			},
 			Extensions: []tls.TLSExtension{
 				&tls.SNIExtension{},                  //server_name
@@ -196,7 +198,7 @@ var Agents = []*Agent{
 				},
 				&tls.SupportedPointsExtension{
 					SupportedPoints: []byte{ //ec_point_formats
-						0,
+						0x0,
 					},
 				},
 				&tls.SessionTicketExtension{},
@@ -248,22 +250,9 @@ var Agents = []*Agent{
 		},
 	},
 	{
-		Name:    "firefox",
-		Version: 105,
-		Headers: map[string]string{
-			"Host":                      "indeed.com",
-			"User-Agent":                "Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0",
-			"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-			"Accept-Language":           "en-US,en;q=0.5",
-			"DNT":                       "1",
-			"Upgrade-Insecure-Requests": "1",
-			"Connection":                "keep-alive",
-			"Sec-Fetch-Dest":            "document",
-			"Sec-Fetch-Mode":            "navigate",
-			"Sec-Fetch-Site":            "none",
-			"Sec-Fetch-User":            "?1",
-		},
-		TLSConfig: &tls.ClientHelloSpec{
+		Client:   "firefox",
+		Versions: []string{"105.0"},
+		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS12,
 			TLSVersMax: tls.VersionTLS13,
 			CipherSuites: []uint16{
@@ -373,16 +362,12 @@ var Agents = []*Agent{
 }
 
 type Agent struct {
-	Name        string
-	Version     uint
-	Headers     map[string]string
+	Client      string
+	Version     string
 	TLSConfig   *tls.ClientHelloSpec
+	Headers     map[string]string
 	DialTimeout time.Duration
-}
-
-type ActiveAgent struct {
-	T       http.Transport
-	Headers map[string]string
+	T           *http.Transport
 }
 
 // NewAgent creates a new Agent.
@@ -390,33 +375,26 @@ type ActiveAgent struct {
 // version is the version of the agent.
 // headers is the headers to send with the request.
 // tlsConf is the tls configuration to use.
-// diealTimeout is the timeout for the dial.
+// dialTimeout is the timeout for the dial.
 func NewAgent(
-	name string,
-	version uint,
-	headers map[string]string,
+	client, version string,
 	tlsConf *tls.ClientHelloSpec,
-	diealTimeout time.Duration,
+	headers map[string]string,
+	dialTimeout time.Duration,
 ) *Agent {
-	return &Agent{name, version, headers, tlsConf, diealTimeout}
-}
-
-// NewActiveAgent creates a new ActiveAgent
-// agent is the agent to use.
-func NewActiveAgent(agent *Agent) *ActiveAgent {
-	return &ActiveAgent{
-		T: http.Transport{
-			DialTLSContext: agent.DialTLS,
-		},
-		Headers: agent.Headers,
+	a := Agent{client, version, tlsConf, headers, dialTimeout, nil}
+	t := http.Transport{
+		DialTLSContext: a.DialTLS,
 	}
+	a.T = &t
+	return &a
 }
 
 // DialTLSContext is the dial function for creating TLS connections.
 // ctx is a context provided for cancellation.
 // network is the network on which to open the connection ("tcp", "tcp4" or "tcp6").
 // addr is the address of the server.
-func (a *Agent) DialTLS(ctx context.Context, network string, addr string) (net.Conn, error) {
+func (a *Agent) DialTLS(ctx context.Context, network, addr string) (net.Conn, error) {
 	config := tls.Config{ServerName: addr, InsecureSkipVerify: true}
 	dialConn, err := net.DialTimeout(network, addr, a.DialTimeout)
 	if err != nil {
@@ -436,30 +414,6 @@ func (a *Agent) DialTLS(ctx context.Context, network string, addr string) (net.C
 }
 
 // Stop closes all idle connections.
-func (aa *ActiveAgent) Stop() {
-	aa.T.CloseIdleConnections()
-}
-
-// SelectOne selects the first agent that matches the given condition.
-func SelectOne(condition func(a *Agent) bool) *Agent {
-	for _, a := range Agents {
-		if condition(a) {
-			return a
-		}
-	}
-
-	return nil
-}
-
-// SelectMany selects all agents that match the given condition.
-func SelectMany(condition func(a *Agent) bool) []*Agent {
-	var agents []*Agent
-
-	for _, a := range Agents {
-		if condition(a) {
-			agents = append(agents, a)
-		}
-	}
-
-	return agents
+func (a *Agent) Stop() {
+	a.T.CloseIdleConnections()
 }
