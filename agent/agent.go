@@ -21,11 +21,6 @@ type TLSConfig struct {
 	Value   *tls.ClientHelloSpec
 }
 
-type IdentityHeaders struct {
-	IntFunc func(...interface{}) string
-	Headers []map[string]string
-}
-
 var BaseHeaders = map[string]map[string]string{
 	"firefox": {
 		"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
