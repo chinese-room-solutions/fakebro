@@ -5,393 +5,188 @@ import (
 	"time"
 )
 
-type BrowserIdentifierTokenType uint8
+type TokenType int
 
 const (
-	Mozilla5BrowserIdentifier BrowserIdentifierTokenType = iota
-	TotalBrowserIdentifiers
-)
-
-func (t *BrowserIdentifierTokenType) String() string {
-	names := []string{
-		"Mozilla/5.0",
-	}
-	if *t < BrowserIdentifierTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type WindowSystemTokenType uint8
-
-const (
-	X11WindowSystem WindowSystemTokenType = iota
-	TotalWindowSystems
-)
-
-func (t *WindowSystemTokenType) String() string {
-	names := []string{
-		"X11",
-	}
-	if *t < WindowSystemTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type DeviceTypeTokenType uint8
-
-const (
-	MacintoshDevice DeviceTypeTokenType = iota
+	// Browser identifier token types
+	Mozilla5BrowserIdentifier TokenType = iota
+	// Window system token types
+	X11WindowSystem
+	// Device type token types
+	MacintoshDevice
 	IPhoneDevice
 	IPadDevice
-	TotalDeviceTypes
-)
-
-func (t *DeviceTypeTokenType) String() string {
-	names := []string{
-		"Macintosh",
-		"iPhone",
-		"iPad",
-	}
-	if *t < DeviceTypeTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type OSTokenType uint8
-
-const (
-	MacOSX OSTokenType = iota
+	// OS token types
+	MacOSX
 	WindowsNT
+	Linux
 	IPhoneOS
 	IPadOS
-	Linux
 	Android
-	TotalOSs
-)
-
-func (t *OSTokenType) String() string {
-	names := []string{
-		"Mac OS X",
-		"Windows NT",
-		"iPhone OS",
-		"iPad OS",
-		"Linux",
-		"Android",
-	}
-	if *t < OSTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type OSVersionNumberTokenType uint16
-
-const (
-	// Mac OS
-	MacOS_10_12_6 OSVersionNumberTokenType = iota // Sierra
-	MacOSSierraLatest
-	MacOS_10_13_6 // High Sierra
-	MacOSHighSierraLatest
-	MacOS_11_7_9 // Big Sur
-	MacOSBigSurLatest
-	MacOS_12_6_8 // Monterey
-	MacOSMontereyLatest
-	MacOS_13_5_1 // Ventura
-	MacOSVenturaLatest
-	TotalOSVersionNumbers
-)
-
-func (t *OSVersionNumberTokenType) String() string {
-	names := []string{
-		"10_12_6",
-		"10_12_6",
-		"10_13_6",
-		"10_13_6",
-		"11_7_9",
-		"11_7_9",
-		"12_6_8",
-		"12_6_8",
-		"13_5_1",
-		"13_5_1",
-	}
-	if *t < OSVersionNumberTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type OSArcTokenType uint8
-
-const (
-	Win64Arc OSArcTokenType = iota
-	TotalOSArcs
-)
-
-func (t *OSArcTokenType) String() string {
-	names := []string{
-		"Win64",
-	}
-	if *t < OSArcTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type ProcArcTokenType uint8
-
-const (
-	X64ProcArc ProcArcTokenType = iota
+	// MacOS version number token types
+	MacOS_10_12_6
+	MacOS_10_13_6
+	MacOS_11_7_9
+	MacOS_12_6_8
+	MacOS_13_5_1
+	MacOSLatest
+	// IOS version number token types
+	IOS_13_7
+	IOS_14_8_1
+	IOS_15_7_8
+	IOS_16_6
+	IOSLatest
+	// OS architecture token types
+	Win64Arc
+	// Processor architecture token types
+	X64ProcArc
 	X86_64ProcArc
-	TotalProcArcs
-)
-
-func (t *ProcArcTokenType) String() string {
-	names := []string{
-		"x64",
-		"x86_64",
-	}
-	if *t < ProcArcTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type RevisionTokenType uint8
-
-const (
-	FirefoxRevision RevisionTokenType = iota
-	TotalRevisions
-)
-
-func (t *RevisionTokenType) String() string {
-	names := []string{
-		"rv:",
-	}
-	if *t < RevisionTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type RevisionNumberTokenType uint8
-
-const (
-	FirefoxRevision_99_0 RevisionNumberTokenType = iota
+	// Revision number token types
+	FirefoxRevision_99_0
 	FirefoxRevision_102_0
 	FirefoxRevision_105_0
-	TotalRevisionNumbers
-)
-
-func (t *RevisionNumberTokenType) String() string {
-	names := []string{
-		"99.0",
-		"102.0",
-		"105.0",
-	}
-	if *t < RevisionNumberTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type RenderingEngineTokenType uint8
-
-const (
-	GeckoRenderingEngine RenderingEngineTokenType = iota
+	FirefoxRevisionLatest
+	// Rendering engine token types
+	GeckoRenderingEngine
 	AppleWebKitRenderingEngine
-	TotalRenderingEngines
-)
-
-func (t *RenderingEngineTokenType) String() string {
-	names := []string{
-		"Gecko",
-		"AppleWebKit",
-	}
-	if *t < RenderingEngineTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type RenderingEngineVersionTokenType uint8
-
-const (
-	Gecko_20100101 RenderingEngineVersionTokenType = iota
-	AppleWebKit_537_36
+	// Render version token types
+	Gecko_20100101
+	GeckoLatest
+	AppleWebKit_604_1
 	AppleWebKit_605_1_15
-	TotalRenderingEngineVersions
-)
-
-func (t *RenderingEngineVersionTokenType) String() string {
-	names := []string{
-		"20100101",
-		"537.36",
-		"605.1.15",
-	}
-	if *t < RenderingEngineVersionTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type AdditionalInfoTokenType uint8
-
-const (
-	KHTMLAdditionalInfo AdditionalInfoTokenType = iota
-	TotalAdditionalInfos
-)
-
-func (t *AdditionalInfoTokenType) String() string {
-	names := []string{
-		"KHTML",
-	}
-	if *t < AdditionalInfoTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type BrowserNameTokenType uint8
-
-const (
-	FirefoxBrowser BrowserNameTokenType = iota
-	FxiOSBrowser
+	AppleWebKit_604_1_38
+	AppleWebKitLatest
+	// Additional info token types
+	KHTMLAdditionalInfo
+	// Browser name token types
+	FirefoxBrowser
+	FirefoxMobileBrowser
 	SafariBrowser
-	BraveBrowser
-	TotalBrowsers
-)
-
-func (t *BrowserNameTokenType) String() string {
-	names := []string{
-		"Firefox",
-		"FxiOS",
-		"Safari",
-		"Brave",
-	}
-	if *t < BrowserNameTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type BrowserVersionTokenType uint8
-
-const (
-	Firefox_99_0 BrowserVersionTokenType = iota
+	// Browser version token types
+	Firefox_99_0
 	Firefox_102_0
 	Firefox_105_0
-	Safari_604_1_38
-	Safari_604_1
-	Brave_1_29_81
-	TotalBrowserVersions
+	FirefoxLatest
+	SafariBrowserVersion
+	Safari_16_5_2
+	Safari_15_6_1
+	SafariLatest
+	// Mobile token types
+	Mobile
+	// Mobile version token types
+	Mobile_15E148
+	MobileLatest
+	TotalTokens
 )
 
-func (t *BrowserVersionTokenType) String() string {
-	names := []string{
-		"99.0",
-		"102.0",
-		"105.0",
-		"604.1.38",
-		"604.1",
-		"1.29.81",
+func (t TokenType) String() string {
+	switch t {
+	case Mozilla5BrowserIdentifier:
+		return "Mozilla/5.0"
+	case X11WindowSystem:
+		return "X11"
+	case MacintoshDevice:
+		return "Macintosh"
+	case IPhoneDevice:
+		return "iPhone"
+	case IPadDevice:
+		return "iPad"
+	case MacOSX:
+		return "Intel Mac OS X"
+	case WindowsNT:
+		return "Windows NT 10.0"
+	case Linux:
+		return "Linux"
+	case IPhoneOS:
+		return "CPU iPhone OS %s like Mac OS X"
+	case IPadOS:
+		return "CPU OS %s like Mac OS X"
+	case Android:
+		return "Android"
+	case MacOS_10_12_6:
+		return "10_12_6"
+	case MacOS_10_13_6:
+		return "10_13_6"
+	case MacOS_11_7_9:
+		return "11_7_9"
+	case MacOS_12_6_8:
+		return "12_6_8"
+	case MacOS_13_5_1, MacOSLatest:
+		return "13_5_1"
+	case IOS_13_7:
+		return "13_7"
+	case IOS_14_8_1:
+		return "14_8_1"
+	case IOS_15_7_8:
+		return "15_7_8"
+	case IOS_16_6, IOSLatest:
+		return "16_6"
+	case Win64Arc:
+		return "Win64"
+	case X64ProcArc:
+		return "x64"
+	case X86_64ProcArc:
+		return "x86_64"
+	case FirefoxRevision_99_0:
+		return "rv:99.0"
+	case FirefoxRevision_102_0:
+		return "rv:102.0"
+	case FirefoxRevision_105_0, FirefoxRevisionLatest:
+		return "rv:105.0"
+	case GeckoRenderingEngine:
+		return "Gecko"
+	case AppleWebKitRenderingEngine:
+		return "AppleWebKit"
+	case Gecko_20100101, GeckoLatest:
+		return "20100101"
+	case AppleWebKit_604_1:
+		return "604.1"
+	case AppleWebKit_605_1_15:
+		return "605.1.15"
+	case AppleWebKit_604_1_38, AppleWebKitLatest:
+		return "604.1.38"
+	case KHTMLAdditionalInfo:
+		return "(KHTML, like Gecko)"
+	case FirefoxBrowser:
+		return "Firefox"
+	case FirefoxMobileBrowser:
+		return "FxiOS"
+	case SafariBrowser:
+		return "Safari"
+	case Firefox_99_0:
+		return "99.0"
+	case Firefox_102_0:
+		return "102.0"
+	case Firefox_105_0, FirefoxLatest:
+		return "105.0"
+	case Safari_16_5_2:
+		return "16.5.2"
+	case Safari_15_6_1, SafariBrowserVersion:
+		return "15.6.1"
+	case Mobile:
+		return "Mobile"
+	case Mobile_15E148, MobileLatest:
+		return "15E148"
+	default:
+		return ""
 	}
-	if *t < BrowserVersionTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type MobileTokenType uint8
-
-const (
-	MobileMobile MobileTokenType = iota
-	TotalMobiles
-)
-
-func (t *MobileTokenType) String() string {
-	names := []string{
-		"Mobile",
-	}
-	if *t < MobileTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
-}
-
-type MobileBuildNumberTokenType uint8
-
-const (
-	Mobile_15E148 MobileBuildNumberTokenType = iota
-	TotalMobileBuildNumbers
-)
-
-func (t *MobileBuildNumberTokenType) String() string {
-	names := []string{
-		"15E148",
-	}
-	if *t < MobileBuildNumberTokenType(len(names)) {
-		return names[*t]
-	}
-	return ""
 }
 
 type Token struct {
-	Possibilities []interface{}
+	Possibilities []TokenType
 	rand          *rand.Rand
 }
 
+type UserAgent struct {
+	Header  string
+	Client  string
+	Version string
+}
+
 func NewToken() *Token {
-	possibilities := []interface{}{}
-	for i := BrowserIdentifierTokenType(0); i < TotalBrowserIdentifiers; i++ {
-		possibilities = append(possibilities, BrowserIdentifierTokenType(i))
-	}
-	for i := WindowSystemTokenType(0); i < TotalWindowSystems; i++ {
-		possibilities = append(possibilities, WindowSystemTokenType(i))
-	}
-	for i := DeviceTypeTokenType(0); i < TotalDeviceTypes; i++ {
-		possibilities = append(possibilities, DeviceTypeTokenType(i))
-	}
-	for i := OSTokenType(0); i < TotalOSs; i++ {
-		possibilities = append(possibilities, OSTokenType(i))
-	}
-	for i := OSVersionNumberTokenType(0); i < TotalOSVersionNumbers; i++ {
-		possibilities = append(possibilities, OSVersionNumberTokenType(i))
-	}
-	for i := OSArcTokenType(0); i < TotalOSArcs; i++ {
-		possibilities = append(possibilities, OSArcTokenType(i))
-	}
-	for i := ProcArcTokenType(0); i < TotalProcArcs; i++ {
-		possibilities = append(possibilities, ProcArcTokenType(i))
-	}
-	for i := RevisionTokenType(0); i < TotalRevisions; i++ {
-		possibilities = append(possibilities, RevisionTokenType(i))
-	}
-	for i := RevisionNumberTokenType(0); i < TotalRevisionNumbers; i++ {
-		possibilities = append(possibilities, RevisionNumberTokenType(i))
-	}
-	for i := RenderingEngineTokenType(0); i < TotalRenderingEngines; i++ {
-		possibilities = append(possibilities, RenderingEngineTokenType(i))
-	}
-	for i := RenderingEngineVersionTokenType(0); i < TotalRenderingEngineVersions; i++ {
-		possibilities = append(possibilities, RenderingEngineVersionTokenType(i))
-	}
-	for i := AdditionalInfoTokenType(0); i < TotalAdditionalInfos; i++ {
-		possibilities = append(possibilities, AdditionalInfoTokenType(i))
-	}
-	for i := BrowserNameTokenType(0); i < TotalBrowsers; i++ {
-		possibilities = append(possibilities, BrowserNameTokenType(i))
-	}
-	for i := BrowserVersionTokenType(0); i < TotalBrowserVersions; i++ {
-		possibilities = append(possibilities, BrowserVersionTokenType(i))
-	}
-	for i := MobileTokenType(0); i < TotalMobiles; i++ {
-		possibilities = append(possibilities, MobileTokenType(i))
-	}
-	for i := MobileBuildNumberTokenType(0); i < TotalMobileBuildNumbers; i++ {
-		possibilities = append(possibilities, MobileBuildNumberTokenType(i))
+	possibilities := []TokenType{}
+	for i := TokenType(0); i < TotalTokens; i++ {
+		possibilities = append(possibilities, TokenType(i))
 	}
 
 	return &Token{
@@ -400,218 +195,213 @@ func NewToken() *Token {
 	}
 }
 
-func (t *Token) Observe(in *Token) {
-	for _, possibility := range in.Possibilities {
-		switch v := possibility.(type) {
-		case DeviceTypeTokenType:
-			switch v {
-			case IPhoneDevice:
-				t.removePossibilities(OSTokenType(0), TotalOSs, IPhoneOS)
-			case IPadDevice:
-				t.removePossibilities(OSTokenType(0), TotalOSs, IPadOS)
-			case MacintoshDevice:
-				t.removePossibilities(OSTokenType(0), TotalOSs, MacOSX)
-			}
-
-		case OSTokenType:
-			switch v {
-			case IPhoneOS:
-				t.removePossibilities(DeviceTypeTokenType(0), TotalDeviceTypes, IPhoneDevice)
-			case IPadOS:
-				t.removePossibilities(DeviceTypeTokenType(0), TotalDeviceTypes, IPadDevice)
-			case MacOSX:
-				t.removePossibilities(DeviceTypeTokenType(0), TotalDeviceTypes, MacintoshDevice)
-			case WindowsNT:
-				t.removePossibilities(OSArcTokenType(0), TotalOSArcs, Win64Arc)
-			}
-
-		case BrowserNameTokenType:
-			switch v {
-			case SafariBrowser:
-				// Removing non-Apple possibilities
-				t.removePossibilities(DeviceTypeTokenType(0), TotalDeviceTypes, MacintoshDevice, IPhoneDevice, IPadDevice)
-				t.removePossibilities(OSTokenType(0), TotalOSs, MacOSX, IPhoneOS, IPadOS)
-			case FirefoxBrowser:
-				t.removePossibility(FxiOSBrowser)
-			case FxiOSBrowser:
-				t.removePossibility(FirefoxBrowser)
-			}
-		}
+func NewUserAgent(length int) *UserAgent {
+	tokens := make([]*Token, length)
+	for i := 0; i < len(tokens); i++ {
+		tokens[i] = NewToken()
 	}
-}
+	tokens[0].Possibilities = []TokenType{Mozilla5BrowserIdentifier}
+	Header, Client, Version := "", "", ""
 
-// removePossibilities is a helper function that removes all possibilities within the range [start, end], except those in the `keep` list
-func (t *Token) removePossibilities(start, end interface{}, keep ...interface{}) {
-	toRemove := []interface{}{}
-	for _, possibility := range t.Possibilities {
-		if isBetween(possibility, start, end) && !contains(keep, possibility) {
-			toRemove = append(toRemove, possibility)
-		}
-	}
-
-	// Actually remove the values
-	for _, rem := range toRemove {
-		t.removePossibility(rem)
-	}
-}
-
-// removePossibility is a helper function that removes a specific possibility
-func (t *Token) removePossibility(val interface{}) {
-	index := -1
-	for i, possibility := range t.Possibilities {
-		if possibility == val {
-			index = i
+	for i, t := range tokens {
+		tt := t.Collapse()
+		if tt == nil {
 			break
 		}
+		Header += tt.String() + " "
+
+		if *tt == FirefoxBrowser || *tt == SafariBrowser {
+			Client = tt.String()
+		}
+
+		if (*tt >= Firefox_99_0 && *tt <= FirefoxLatest) || (*tt >= Safari_15_6_1 && *tt <= SafariLatest) {
+			Version = tt.String()
+		}
+
+		for j := i + 1; j < len(tokens); j++ {
+			tokens[j].Observe(t, tokens[j-1], j-i)
+		}
 	}
-	if index != -1 {
-		t.Possibilities = append(t.Possibilities[:index], t.Possibilities[index+1:]...)
+
+	return &UserAgent{
+		Header:  Header,
+		Client:  Client,
+		Version: Version,
 	}
 }
 
-// isBetween checks if a value is between two given boundaries
-func isBetween(val, start, end interface{}) bool {
-	return val.(int) >= start.(int) && val.(int) < end.(int)
+func (t *Token) Collapse() *TokenType {
+	if len(t.Possibilities) == 0 {
+		return nil
+	}
+	t.Possibilities = []TokenType{
+		t.Possibilities[t.rand.Intn(len(t.Possibilities))],
+	}
+	return &t.Possibilities[0]
 }
 
-// contains checks if a list contains a specific value
-func contains(list []interface{}, val interface{}) bool {
-	for _, item := range list {
-		if item == val {
+func (t *Token) Observe(collapsed, prev *Token, depth int) {
+	if prev == nil {
+		return
+	}
+
+	reduced := []TokenType{}
+	for _, currentType := range t.Possibilities {
+		for _, prevType := range prev.Possibilities {
+			if isCompatible(collapsed.Possibilities[0], prevType, currentType, depth) {
+				reduced = append(reduced, currentType)
+				break
+			}
+		}
+	}
+	t.Possibilities = reduced
+}
+
+func isCompatible(collapsed, prev, current TokenType, depth int) bool {
+	// Browser identifier must be followed by Window system, Device Type, or OS type
+	if prev == Mozilla5BrowserIdentifier {
+		return current == X11WindowSystem ||
+			(current >= MacintoshDevice && current <= IPadDevice) ||
+			(current == Android || current == WindowsNT)
+	}
+
+	// Window system must be followed by OS (Linux)
+	if prev == X11WindowSystem {
+		return current == Linux
+	}
+
+	// Macintosh devices should be followed by MacOS
+	if prev == MacintoshDevice {
+		return current == MacOSX
+	}
+
+	// iPhone or iPad should be followed by corresponding OS
+	if prev == IPhoneDevice {
+		return current == IPhoneOS
+	}
+	if prev == IPadDevice {
+		return current == IPadOS
+	}
+
+	// MacOSX, WindowsNT, or other OS should be followed by corresponding version numbers or architecture
+	if prev == MacOSX {
+		return current >= MacOS_10_12_6 && current <= MacOSLatest
+	}
+	if prev == WindowsNT {
+		return current == Win64Arc
+	}
+	if prev == Linux {
+		return current == X86_64ProcArc
+	}
+	if prev == IPhoneOS {
+		return current >= IOS_13_7 && current <= IOSLatest
+	}
+	if prev == IPadOS {
+		return current >= IOS_13_7 && current <= IOSLatest
+	}
+	if prev == Android {
+		return current == Mobile
+	}
+
+	// Processor architecture and OS Architecture (e.g., Win64 should be followed by x64)
+	if prev == Win64Arc {
+		return current == X64ProcArc
+	}
+
+	// Processor architecture should be followed by Revision number or Rendering engine
+	if prev == X64ProcArc || prev == X86_64ProcArc {
+		return current >= FirefoxRevision_99_0 && current <= FirefoxRevisionLatest ||
+			current == AppleWebKitRenderingEngine
+	}
+
+	// OS version should be followed by Rendering engine or Revision number
+	if prev >= MacOS_10_12_6 && prev <= MacOSLatest {
+		return current >= FirefoxRevision_99_0 && current <= FirefoxRevisionLatest || current == AppleWebKitRenderingEngine
+	}
+
+	// iOS version should be followed by Rendering engine
+	if prev >= IOS_13_7 && prev <= IOSLatest {
+		return current == AppleWebKitRenderingEngine
+	}
+
+	// Revision number should be followed by Rendering engine
+	if prev >= FirefoxRevision_99_0 && prev <= FirefoxRevisionLatest {
+		return current == GeckoRenderingEngine
+	}
+
+	// Rendering engine should be followed by Render version
+	if prev == GeckoRenderingEngine {
+		return current >= Gecko_20100101 && current <= GeckoLatest
+	}
+	if prev == AppleWebKitRenderingEngine {
+		return current >= AppleWebKit_604_1_38 && current <= AppleWebKitLatest
+	}
+
+	// Gecko render version should be followed by Browser name
+	if prev >= Gecko_20100101 && prev <= GeckoLatest {
+		return current == FirefoxBrowser
+	}
+
+	// Apple WebKit version should be followed by additional info
+	if prev >= AppleWebKit_604_1_38 && prev <= AppleWebKitLatest {
+		return current == KHTMLAdditionalInfo
+	}
+
+	// Browser name should be followed by Browser version
+	if prev == FirefoxBrowser || prev == FirefoxMobileBrowser {
+		return current >= Firefox_99_0 && current <= FirefoxLatest
+	}
+	if prev == SafariBrowser {
+		if collapsed >= AppleWebKit_604_1 && collapsed <= AppleWebKitLatest {
+			return current == collapsed
+		}
+		return current >= AppleWebKit_604_1 && current <= AppleWebKitLatest
+	}
+
+	// Additional info should be followed by mobile Browser or Mobile token
+	if prev == KHTMLAdditionalInfo {
+		return current == FirefoxMobileBrowser || current == SafariBrowserVersion
+	}
+
+	// Safari version token should be followed by version token
+	if prev == SafariBrowserVersion {
+		return current >= Safari_15_6_1 && current <= SafariLatest
+	}
+
+	// Safari version should be followed by Safari browser
+	if prev >= Safari_15_6_1 && prev <= SafariLatest {
+		return current == SafariBrowser
+	}
+
+	// Mobile token should be followed by Mobile version
+	if prev == Mobile {
+		if collapsed == Android {
+			return current <= Mobile_15E148 && current >= MobileLatest
+		}
+		return current >= Mobile_15E148 && current <= MobileLatest
+	}
+
+	// Mobile version should be followed by Browser token
+	if prev >= Mobile_15E148 && prev <= MobileLatest {
+		return current == SafariBrowser
+	}
+
+	// Mobile Firefox should be followed by Mobile token
+	if depth == 2 && collapsed == FirefoxMobileBrowser {
+		return current == Mobile
+	}
+
+	return false
+}
+
+func contain(tt TokenType, tts []TokenType) bool {
+	for _, t := range tts {
+		if t == tt {
 			return true
 		}
 	}
 	return false
 }
-
-// func (t *Token) Collapse() (*TokenType, *string) {
-// 	if len(t.Possibilities) == 0 {
-// 		return nil, nil
-// 	}
-// 	p := t.Possibilities[t.rand.Intn(len(t.Possibilities))]
-// 	p.Values = []string{p.Values[t.rand.Intn(len(p.Values))]}
-// 	t.Possibilities = []*Possibility{p}
-// 	return p.Type, &p.Values[0]
-// }
-
-// type UserAgent struct {
-// 	Header  string
-// 	Client  string
-// 	Version string
-// }
-
-// func NewUserAgent() *UserAgent {
-// 	t := NewToken()
-// 	tt, tv := BrowserIdentifierToken.Collapse()
-// 	Tokens := []*Token{
-// 		NewToken(BrowserIdentifierToken, BrowserIdentifiers, nil),
-// 	}
-// }
-
-// var UAParts = map[TokenType][]string{
-// 	BrowserIdentifierToken: {
-// 		"Mozilla/5.0",
-// 	},
-// 	WindowSystemToken: {
-// 		"X11",
-// 	},
-// 	DeviceTypeToken: {
-// 		"Macintosh", "Windows NT", "iPhone", "iPad", "Linux", "Android",
-// 	},
-// 	OperatingSystemToken: {
-// 		"Intel Mac OS X", "CPU iPhone OS",
-// 	},
-// }
-
-var (
-	BrowserIdentifiers = []string{"Mozilla/5.0"}
-	WindowSystems      = []string{"X11"}
-	DeviceTypes        = []string{"Macintosh", "Windows NT", "iPhone", "iPad", "Linux", "Android"}
-	OperatingSystems   = []string{
-		"Intel Mac OS X 10_12_6", "Intel Mac OS X 11_0_1",
-		"6.1; WOW64", "10.0; Win64; x64",
-		"CPU iPhone OS 10_3_2 like Mac OS X",
-		"CPU OS 10_3_2 like Mac OS X",
-		"Android 4.3; GT-I9300 Build/JSS15J",
-		"4.3; Mobile",
-	}
-	MacOSVersions = []string{"10_12_6", "11_0_1"}
-	BrowserNames  = []string{"Firefox", "Safari", "Brave"}
-
-	RenderingEngineMapping = map[string]string{
-		"Firefox": "Gecko",
-		"Safari":  "AppleWebKit",
-		"Brave":   "AppleWebKit",
-	}
-
-	RenderVersionMapping = map[string][]string{
-		"Firefox": {"rv:54.0", "rv:99.0"},
-		"Safari":  {},
-		"Brave":   {},
-	}
-
-	AdditionalInfos = map[string][]string{
-		"AppleWebKit": {"(KHTML, like Gecko)", "(KHTML, like Gecko) Chrome/59.0.3071.115", "(KHTML, like Gecko) Chrome/59.0.3071.125 Mobile"},
-		"Gecko":       {"Firefox/54.0", "Firefox/99.0"},
-	}
-)
-
-// func (t *Token) Observe() string {
-// 	return t.Options[rand.Intn(len(t.Options))]
-// }
-
-// func NewToken(TokenType TokenType, observedValue string) *Token {
-// 	t := &Token{Type: TokenType}
-
-// 	switch TokenType {
-// 	case BrowserIdentifierToken:
-// 		t.Options = BrowserIdentifiers
-// 	case DeviceTypeToken:
-// 		t.Options = DeviceTypes
-// 	case OperatingSystemToken:
-// 		t.Options = OperatingSystems[observedValue]
-// 	case RenderVersionToken:
-// 		t.Options = RenderVersionMapping[observedValue]
-// 	case RenderingEngineToken:
-// 		t.Options = []string{RenderingEngineMapping[observedValue]}
-// 	case AdditionalInfoToken:
-// 		t.Options = AdditionalInfos[observedValue]
-// 	case BrowserNameToken:
-// 		t.Options = BrowserNames
-// 	case BrowserVersionToken:
-// 		t.Options = []string{"54.0", "99.0", "603.3.8", "537.36"}
-// 	}
-
-// 	return t
-// }
-
-// func GenerateUserAgent() string {
-// 	browserIdentifierToken := NewToken(BrowserIdentifierToken, "")
-// 	browserIdentifierValue := browserIdentifierToken.Observe()
-
-// 	deviceTypeToken := NewToken(DeviceTypeToken, "")
-// 	deviceTypeValue := deviceTypeToken.Observe()
-
-// 	operatingSystemToken := NewToken(OperatingSystemToken, deviceTypeValue)
-// 	operatingSystemValue := operatingSystemToken.Observe()
-
-// 	browserNameToken := NewToken(BrowserNameToken, "")
-// 	browserNameValue := browserNameToken.Observe()
-
-// 	renderingEngineToken := NewToken(RenderingEngineToken, browserNameValue)
-// 	renderingEngineValue := renderingEngineToken.Observe()
-
-// 	additionalInfoToken := NewToken(AdditionalInfoToken, renderingEngineValue)
-// 	additionalInfoValue := additionalInfoToken.Observe()
-
-// 	renderVersionToken := NewToken(RenderVersionToken, browserNameValue)
-// 	renderVersionValue := renderVersionToken.Observe()
-
-// 	browserVersionToken := NewToken(BrowserVersionToken, browserNameValue)
-// 	browserVersionValue := browserVersionToken.Observe()
-
-// 	return fmt.Sprintf("%s (%s; %s; %s) %s %s %s/%s", browserIdentifierValue, deviceTypeValue, operatingSystemValue, renderVersionValue, renderingEngineValue, additionalInfoValue, browserNameValue, browserVersionValue)
-// }
 
 func isInterpolatable(s string) bool {
 	for i := 0; i < len(s)-1; i++ {
@@ -623,4 +413,6 @@ func isInterpolatable(s string) bool {
 }
 
 func main() {
+	ua := NewUserAgent(20)
+	println(ua.Header)
 }
