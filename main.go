@@ -17,39 +17,40 @@ const (
 	IPhoneDevice
 	IPadDevice
 	// OS token types
-	MacOSX
-	WindowsNT
-	Linux
-	IPhoneOS
-	IPadOS
-	Android
-	// MacOS version number token types
 	MacOS_10_12_6
 	MacOS_10_13_6
 	MacOS_11_7_9
 	MacOS_12_6_8
 	MacOS_13_5_1
 	MacOSLatest
-	// IOS version number token types
-	IOS_13_7
-	IOS_14_8_1
-	IOS_15_7_8
-	IOS_16_6
-	IOSLatest
+	WindowsNT_10_0
+	WindowsLatest
+	Linux
+	IPhoneOS_13_7
+	IPhoneOS_14_8_1
+	IPhoneOS_15_7_8
+	IPhoneOS_16_6
+	IPhoneOSLatest
+	IPadOS_13_7
+	IPadOS_14_8_1
+	IPadOS_15_7_8
+	IPadOS_16_6
+	IPadOSLatest
+	Android_11
+	Android_12
+	Android_13
+	AndroidLatest
 	// OS architecture token types
 	Win64Arc
 	// Processor architecture token types
 	X64ProcArc
 	X86_64ProcArc
 	// Revision number token types
-	FirefoxRevision_99_0
-	FirefoxRevision_102_0
-	FirefoxRevision_105_0
-	FirefoxRevisionLatest
+	Revision_99_0
+	Revision_102_0
+	Revision_105_0
+	RevisionLatest
 	// Rendering engine token types
-	GeckoRenderingEngine
-	AppleWebKitRenderingEngine
-	// Render version token types
 	Gecko_20100101
 	GeckoLatest
 	AppleWebKit_604_1
@@ -59,23 +60,25 @@ const (
 	// Additional info token types
 	KHTMLAdditionalInfo
 	// Browser name token types
-	FirefoxBrowser
-	FirefoxMobileBrowser
-	SafariBrowser
-	// Browser version token types
 	Firefox_99_0
 	Firefox_102_0
 	Firefox_105_0
 	FirefoxLatest
-	SafariBrowserVersion
+	FirefoxMobile_99_0
+	FirefoxMobile_102_0
+	FirefoxMobile_105_0
+	FirefoxMobileLatest
 	Safari_16_5_2
 	Safari_15_6_1
 	SafariLatest
+	SafariWebKit_604_1
+	SafariWebKit_605_1_15
+	SafariWebKit_604_1_38
+	SafariWebKitLatest
 	// Mobile token types
-	Mobile
-	// Mobile version token types
 	Mobile_15E148
 	MobileLatest
+
 	TotalTokens
 )
 
@@ -91,82 +94,88 @@ func (t TokenType) String() string {
 		return "iPhone"
 	case IPadDevice:
 		return "iPad"
-	case MacOSX:
-		return "Intel Mac OS X"
-	case WindowsNT:
+	case MacOS_10_12_6:
+		return "Intel Mac OS X 10_12_6"
+	case MacOS_10_13_6:
+		return "Intel Mac OS X 10_13_6"
+	case MacOS_11_7_9:
+		return "Intel Mac OS X 11_7_9"
+	case MacOS_12_6_8:
+		return "Intel Mac OS X 12_6_8"
+	case MacOS_13_5_1, MacOSLatest:
+		return "Intel Mac OS X 13_5_1"
+	case WindowsNT_10_0, WindowsLatest:
 		return "Windows NT 10.0"
 	case Linux:
 		return "Linux"
-	case IPhoneOS:
-		return "CPU iPhone OS %s like Mac OS X"
-	case IPadOS:
-		return "CPU OS %s like Mac OS X"
-	case Android:
-		return "Android"
-	case MacOS_10_12_6:
-		return "10_12_6"
-	case MacOS_10_13_6:
-		return "10_13_6"
-	case MacOS_11_7_9:
-		return "11_7_9"
-	case MacOS_12_6_8:
-		return "12_6_8"
-	case MacOS_13_5_1, MacOSLatest:
-		return "13_5_1"
-	case IOS_13_7:
-		return "13_7"
-	case IOS_14_8_1:
-		return "14_8_1"
-	case IOS_15_7_8:
-		return "15_7_8"
-	case IOS_16_6, IOSLatest:
-		return "16_6"
+	case IPhoneOS_13_7:
+		return "CPU iPhone OS 13_7 like Mac OS X"
+	case IPhoneOS_14_8_1:
+		return "CPU iPhone OS 14_8_1 like Mac OS X"
+	case IPhoneOS_15_7_8:
+		return "CPU iPhone OS 15_7_8 like Mac OS X"
+	case IPhoneOS_16_6, IPhoneOSLatest:
+		return "CPU iPhone OS 16_6 like Mac OS X"
+	case IPadOS_13_7:
+		return "CPU OS 13_7 like Mac OS X"
+	case IPadOS_14_8_1:
+		return "CPU OS 14_8_1 like Mac OS X"
+	case IPadOS_15_7_8:
+		return "CPU OS 15_7_8 like Mac OS X"
+	case IPadOS_16_6, IPadOSLatest:
+		return "CPU OS 16_6 like Mac OS X"
+	case Android_11:
+		return "Android 11"
+	case Android_12:
+		return "Android 12"
+	case Android_13, AndroidLatest:
+		return "Android 13"
 	case Win64Arc:
 		return "Win64"
 	case X64ProcArc:
 		return "x64"
 	case X86_64ProcArc:
 		return "x86_64"
-	case FirefoxRevision_99_0:
+	case Revision_99_0:
 		return "rv:99.0"
-	case FirefoxRevision_102_0:
+	case Revision_102_0:
 		return "rv:102.0"
-	case FirefoxRevision_105_0, FirefoxRevisionLatest:
+	case Revision_105_0, RevisionLatest:
 		return "rv:105.0"
-	case GeckoRenderingEngine:
-		return "Gecko"
-	case AppleWebKitRenderingEngine:
-		return "AppleWebKit"
 	case Gecko_20100101, GeckoLatest:
-		return "20100101"
+		return "Gecko/20100101"
 	case AppleWebKit_604_1:
-		return "604.1"
+		return "AppleWebKit/604.1"
 	case AppleWebKit_605_1_15:
-		return "605.1.15"
+		return "AppleWebKit/605.1.15"
 	case AppleWebKit_604_1_38, AppleWebKitLatest:
-		return "604.1.38"
+		return "AppleWebKit/604.1.38"
 	case KHTMLAdditionalInfo:
 		return "(KHTML, like Gecko)"
-	case FirefoxBrowser:
-		return "Firefox"
-	case FirefoxMobileBrowser:
-		return "FxiOS"
-	case SafariBrowser:
-		return "Safari"
 	case Firefox_99_0:
-		return "99.0"
+		return "Firefox/99.0"
 	case Firefox_102_0:
-		return "102.0"
+		return "Firefox/102.0"
 	case Firefox_105_0, FirefoxLatest:
-		return "105.0"
+		return "Firefox/105.0"
+	case FirefoxMobile_99_0:
+		return "FxiOS/99.0"
+	case FirefoxMobile_102_0:
+		return "FxiOS/102.0"
+	case FirefoxMobile_105_0, FirefoxMobileLatest:
+		return "FxiOS/105.0"
 	case Safari_16_5_2:
-		return "16.5.2"
-	case Safari_15_6_1, SafariBrowserVersion:
-		return "15.6.1"
-	case Mobile:
-		return "Mobile"
+		return "Version/16.5.2"
+	case Safari_15_6_1, SafariLatest:
+		return "Version/15.6.1"
+	case SafariWebKit_604_1:
+		return "Safari/604.1"
+	case SafariWebKit_605_1_15:
+		return "Safari/605.1.15"
+	case SafariWebKit_604_1_38, SafariWebKitLatest:
+		return "Safari/604.1.38"
 	case Mobile_15E148, MobileLatest:
-		return "15E148"
+		return "Mobile/15E148"
 	default:
 		return ""
 	}
@@ -210,16 +219,16 @@ func NewUserAgent(length int) *UserAgent {
 		}
 		Header += tt.String() + " "
 
-		if *tt == FirefoxBrowser || *tt == SafariBrowser {
-			Client = tt.String()
-		}
+		// if *tt == FirefoxBrowser || *tt == SafariBrowser {
+		// 	Client = tt.String()
+		// }
 
 		if (*tt >= Firefox_99_0 && *tt <= FirefoxLatest) || (*tt >= Safari_15_6_1 && *tt <= SafariLatest) {
 			Version = tt.String()
 		}
 
 		for j := i + 1; j < len(tokens); j++ {
-			tokens[j].Observe(t, tokens[j-1], j-i)
+			tokens[j].Observe(t, tokens[j-1])
 		}
 	}
 
@@ -240,7 +249,7 @@ func (t *Token) Collapse() *TokenType {
 	return &t.Possibilities[0]
 }
 
-func (t *Token) Observe(collapsed, prev *Token, depth int) {
+func (t *Token) Observe(collapsed, prev *Token) {
 	if prev == nil {
 		return
 	}
@@ -248,7 +257,7 @@ func (t *Token) Observe(collapsed, prev *Token, depth int) {
 	reduced := []TokenType{}
 	for _, currentType := range t.Possibilities {
 		for _, prevType := range prev.Possibilities {
-			if isCompatible(collapsed.Possibilities[0], prevType, currentType, depth) {
+			if isCompatible(collapsed.Possibilities[0], prevType, currentType) {
 				reduced = append(reduced, currentType)
 				break
 			}
@@ -257,12 +266,26 @@ func (t *Token) Observe(collapsed, prev *Token, depth int) {
 	t.Possibilities = reduced
 }
 
-func isCompatible(collapsed, prev, current TokenType, depth int) bool {
+func isCompatible(collapsed, prev, current TokenType) bool {
+	safariVersionLimit := func(collapsed, current TokenType) bool {
+		// Safari WebKit version must correspond to Apple WebKit version
+		if collapsed == AppleWebKit_604_1 {
+			return current == SafariWebKit_604_1
+		}
+		if collapsed == AppleWebKit_604_1_38 {
+			return current == SafariWebKit_604_1_38
+		}
+		if collapsed == AppleWebKit_605_1_15 {
+			return current == SafariWebKit_605_1_15
+		}
+		return false
+	}
+
 	// Browser identifier must be followed by Window system, Device Type, or OS type
 	if prev == Mozilla5BrowserIdentifier {
 		return current == X11WindowSystem ||
 			(current >= MacintoshDevice && current <= IPadDevice) ||
-			(current == Android || current == WindowsNT)
+			(current == WindowsNT_10_0)
 	}
 
 	// Window system must be followed by OS (Linux)
@@ -272,35 +295,25 @@ func isCompatible(collapsed, prev, current TokenType, depth int) bool {
 
 	// Macintosh devices should be followed by MacOS
 	if prev == MacintoshDevice {
-		return current == MacOSX
+		return current >= MacOS_10_12_6 && current <= MacOSLatest
 	}
 
 	// iPhone or iPad should be followed by corresponding OS
 	if prev == IPhoneDevice {
-		return current == IPhoneOS
+		return current >= IPhoneOS_13_7 && current <= IPhoneOSLatest
 	}
 	if prev == IPadDevice {
-		return current == IPadOS
+		return current >= IPadOS_13_7 && current <= IPadOSLatest
 	}
 
-	// MacOSX, WindowsNT, or other OS should be followed by corresponding version numbers or architecture
-	if prev == MacOSX {
-		return current >= MacOS_10_12_6 && current <= MacOSLatest
-	}
-	if prev == WindowsNT {
-		return current == Win64Arc
-	}
+	// Linux should be followed by processor architecture
 	if prev == Linux {
 		return current == X86_64ProcArc
 	}
-	if prev == IPhoneOS {
-		return current >= IOS_13_7 && current <= IOSLatest
-	}
-	if prev == IPadOS {
-		return current >= IOS_13_7 && current <= IOSLatest
-	}
-	if prev == Android {
-		return current == Mobile
+
+	// Windows should be followed by OS architecture
+	if prev == WindowsNT_10_0 {
+		return current == Win64Arc
 	}
 
 	// Processor architecture and OS Architecture (e.g., Win64 should be followed by x64)
@@ -308,87 +321,55 @@ func isCompatible(collapsed, prev, current TokenType, depth int) bool {
 		return current == X64ProcArc
 	}
 
-	// Processor architecture should be followed by Revision number or Rendering engine
+	// Processor architecture should be followed by revision or rendering engine
+	generalCond := current >= Revision_99_0 && current <= RevisionLatest
 	if prev == X64ProcArc || prev == X86_64ProcArc {
-		return current >= FirefoxRevision_99_0 && current <= FirefoxRevisionLatest ||
-			current == AppleWebKitRenderingEngine
+		if collapsed >= WindowsNT_10_0 && collapsed <= WindowsLatest {
+			return generalCond || current >= AppleWebKit_604_1 && current <= AppleWebKitLatest
+		}
+		return generalCond
 	}
 
-	// OS version should be followed by Rendering engine or Revision number
+	// OS should be followed by revision number or rendering engine
+	generalCond = current >= AppleWebKit_604_1 && current <= AppleWebKitLatest
 	if prev >= MacOS_10_12_6 && prev <= MacOSLatest {
-		return current >= FirefoxRevision_99_0 && current <= FirefoxRevisionLatest || current == AppleWebKitRenderingEngine
+		return current >= Revision_99_0 && current <= RevisionLatest || generalCond
+	}
+	if prev >= IPhoneOS_13_7 && prev <= IPhoneOSLatest || prev >= IPadOS_13_7 && prev <= IPadOSLatest {
+		return generalCond
 	}
 
-	// iOS version should be followed by Rendering engine
-	if prev >= IOS_13_7 && prev <= IOSLatest {
-		return current == AppleWebKitRenderingEngine
-	}
-
-	// Revision number should be followed by Rendering engine
-	if prev >= FirefoxRevision_99_0 && prev <= FirefoxRevisionLatest {
-		return current == GeckoRenderingEngine
-	}
-
-	// Rendering engine should be followed by Render version
-	if prev == GeckoRenderingEngine {
+	// Revision should be followed by rendering engine
+	if prev >= Revision_99_0 && prev <= RevisionLatest {
 		return current >= Gecko_20100101 && current <= GeckoLatest
 	}
-	if prev == AppleWebKitRenderingEngine {
-		return current >= AppleWebKit_604_1_38 && current <= AppleWebKitLatest
-	}
 
-	// Gecko render version should be followed by Browser name
+	// Gecko renderer should be followed by browser
 	if prev >= Gecko_20100101 && prev <= GeckoLatest {
-		return current == FirefoxBrowser
+		return current >= Firefox_99_0 && current <= FirefoxLatest
 	}
 
 	// Apple WebKit version should be followed by additional info
-	if prev >= AppleWebKit_604_1_38 && prev <= AppleWebKitLatest {
+	if prev >= AppleWebKit_604_1 && prev <= AppleWebKitLatest {
 		return current == KHTMLAdditionalInfo
 	}
 
-	// Browser name should be followed by Browser version
-	if prev == FirefoxBrowser || prev == FirefoxMobileBrowser {
-		return current >= Firefox_99_0 && current <= FirefoxLatest
-	}
-	if prev == SafariBrowser {
-		if collapsed >= AppleWebKit_604_1 && collapsed <= AppleWebKitLatest {
-			return current == collapsed
-		}
-		return current >= AppleWebKit_604_1 && current <= AppleWebKitLatest
-	}
-
-	// Additional info should be followed by mobile Browser or Mobile token
+	// Additional info should be followed by mobile browser or Safari
 	if prev == KHTMLAdditionalInfo {
-		return current == FirefoxMobileBrowser || current == SafariBrowserVersion
+		return current >= FirefoxMobile_99_0 && current <= FirefoxMobileLatest || current >= Safari_15_6_1 && current <= SafariLatest
 	}
 
-	// Safari version token should be followed by version token
-	if prev == SafariBrowserVersion {
-		return current >= Safari_15_6_1 && current <= SafariLatest
-	}
-
-	// Safari version should be followed by Safari browser
-	if prev >= Safari_15_6_1 && prev <= SafariLatest {
-		return current == SafariBrowser
-	}
-
-	// Mobile token should be followed by Mobile version
-	if prev == Mobile {
-		if collapsed == Android {
-			return current <= Mobile_15E148 && current >= MobileLatest
-		}
+	// Mobile Browser should be followed by mobile build
+	if prev >= FirefoxMobile_99_0 && prev <= FirefoxMobileLatest {
 		return current >= Mobile_15E148 && current <= MobileLatest
 	}
 
-	// Mobile version should be followed by Browser token
-	if prev >= Mobile_15E148 && prev <= MobileLatest {
-		return current == SafariBrowser
-	}
-
-	// Mobile Firefox should be followed by Mobile token
-	if depth == 2 && collapsed == FirefoxMobileBrowser {
-		return current == Mobile
+	// Safari should be followed by Safari-WebKit version and mobile build should be followed by browser token
+	if (prev >= Safari_15_6_1 && prev <= SafariLatest) || (prev >= Mobile_15E148 && prev <= MobileLatest) {
+		if collapsed >= AppleWebKit_604_1 && collapsed <= AppleWebKitLatest {
+			return safariVersionLimit(collapsed, current)
+		}
+		return current >= SafariWebKit_604_1 && current <= SafariWebKitLatest
 	}
 
 	return false
@@ -397,15 +378,6 @@ func isCompatible(collapsed, prev, current TokenType, depth int) bool {
 func contain(tt TokenType, tts []TokenType) bool {
 	for _, t := range tts {
 		if t == tt {
-			return true
-		}
-	}
-	return false
-}
-
-func isInterpolatable(s string) bool {
-	for i := 0; i < len(s)-1; i++ {
-		if s[i] == '%' && s[i+1] == 's' {
 			return true
 		}
 	}
