@@ -3,13 +3,11 @@ package agent
 import (
 	"errors"
 	"math/rand"
-	"sync"
+	"sync/atomic"
 	"time"
 )
 
-var NilPool = errors.New("pool is closed or not initialized")
-
-type ActiveAgentPool struct {
+type AgentPool struct {
 	Agents      chan *Agent
 	Roller      *Roller
 	Network     string
@@ -17,24 +15,25 @@ type ActiveAgentPool struct {
 	DialTimeout time.Duration
 	Condition   func(*Agent) bool
 	Limit       int
-	Size        int
+	Size        atomic.Int32
 	Index       int
-	lock        sync.Mutex
 }
 
-// NewActiveAgentPool creates a new active agent pool.
+var ErrClosedPool = errors.New("pool is closed")
+
+// NewAgentPool creates a new active agent pool.
 // address is the address of the server.
 // dialTimeout is the timeout for dialing the server.
 // limit is the maximum number of active agents.
 // condition is the condition for selecting agents.
-func NewActiveAgentPool(
+func NewAgentPool(
 	network string,
 	address string,
 	dialTimeout time.Duration,
 	limit int,
 	condition func(*Agent) bool,
-) *ActiveAgentPool {
-	p := ActiveAgentPool{
+) *AgentPool {
+	p := AgentPool{
 		Network:     network,
 		Address:     address,
 		DialTimeout: dialTimeout,
@@ -47,54 +46,47 @@ func NewActiveAgentPool(
 }
 
 // Roll rotates the agents for the pool.
-func (p *ActiveAgentPool) Roll() {
+func (p *AgentPool) Roll() {
 	p.Close()
 	p.Agents = SelectMany(p.Condition)
 	rand.Shuffle(len(p.Agents), func(i, j int) {
 		p.Agents[i], p.Agents[j] = p.Agents[j], p.Agents[i]
 	})
-	p.ActiveAgents = make(chan *ActiveAgent, p.Limit)
+	p.Agents = make(chan *Agent, p.Limit)
 }
 
 // Get an active agent from the pool.
-func (p *ActiveAgentPool) Get() (*ActiveAgent, error) {
-	var aa *ActiveAgent
-	if p.ActiveAgents == nil {
-		return nil, NilPool
-	}
-	if len(p.ActiveAgents) == 0 && p.Size < p.Limit {
-		p.lock.Lock()
-		defer p.lock.Unlock()
-		aa = NewActiveAgent(p.Agents[p.Index])
+func (p *AgentPool) Get() *Agent {
+	var aa *Agent
+	if len(p.Agents) == 0 && int(p.Size.Load()) < p.Limit {
+		aa = NewAgent(p.Agents[p.Index])
 		p.Index = (p.Index + 1) % len(p.Agents)
-		p.Size++
-		return aa, nil
-	} else {
-		aa := <-p.ActiveAgents
-		return aa, nil
+		p.Size.Add(1)
+		return aa
 	}
+	return <-p.Agents
 }
 
 // Put an active agent back to the pool.
 // To delete an active agent, just don't put it back and decrement the pool size.
 // Don't put an active agent back to the pool if it is not created by the pool as it may lead to deadlock.
-func (p *ActiveAgentPool) Put(aa *ActiveAgent) error {
+func (p *AgentPool) Put(aa *Agent) error {
 	select {
-	case p.ActiveAgents <- aa:
+	case p.Agents <- aa:
 		return nil
 	default:
-		return NilPool
+		return ErrClosedPool
 	}
 }
 
 // Close the pool.
-func (p *ActiveAgentPool) Close() {
-	if p.ActiveAgents != nil {
+func (p *AgentPool) Close() {
+	if p.Agents != nil {
 		p.Index = 0
-		close(p.ActiveAgents)
-		for aa := range p.ActiveAgents {
+		close(p.Agents)
+		for aa := range p.Agents {
 			aa.Stop()
 		}
-		p.ActiveAgents = nil
+		p.Agents = nil
 	}
 }

@@ -28,7 +28,7 @@ func TestGet(t *testing.T) {
 	}
 	_, err := p.Get()
 	require.Error(t, err)
-	require.Equal(t, NilPool, err)
+	require.Equal(t, ErrNilPool, err)
 
 	p = NewActiveAgentPool(
 		"tcp", "indeed.com:443", 200*time.Millisecond, 2,

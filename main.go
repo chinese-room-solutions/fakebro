@@ -8,8 +8,9 @@ import (
 type TokenType int
 
 const (
+	_ TokenType = iota
 	// Browser identifier token types
-	Mozilla5BrowserIdentifier TokenType = iota
+	Mozilla5BrowserIdentifier
 	// Window system token types
 	X11WindowSystem
 	// Device type token types
@@ -17,6 +18,7 @@ const (
 	IPhoneDevice
 	IPadDevice
 	// OS token types
+	StartMacOS
 	MacOS_10_14_6
 	MacOS_10_15_7
 	MacOS_11_5
@@ -30,25 +32,30 @@ const (
 	MacOS_13_3_1
 	MacOS_13_5
 	MacOS_13_5_1
-	MacOSLatest
+	EndMacOS
+	StartWindows
 	WindowsNT_10_0
-	WindowsLatest
+	EndWindows
 	Linux
+	StartIPhoneOS
 	IPhoneOS_13_7
 	IPhoneOS_14_8_1
 	IPhoneOS_15_7_8
 	IPhoneOS_16_6
-	IPhoneOSLatest
+	EndIPhoneOS
+	StartIPadOS
 	IPadOS_13_7
 	IPadOS_14_8_1
 	IPadOS_15_7_8
 	IPadOS_16_6
-	IPadOSLatest
+	EndIPadOS
+	StartAndroid
 	Android_11
 	Android_12
 	Android_13
-	AndroidLatest
+	EndAndroid
 	// Android device models
+	StartAndroidDeviceModel
 	SM_G973F // Galaxy S10
 	SM_G973U
 	SM_A515F // Galaxy A51
@@ -74,46 +81,64 @@ const (
 	Moto_G_5G_2022
 	Moto_G_Power_2021
 	Moto_G_Power_2022
+	Redmi_Note_8_Pro
+	Redmi_Note_9_Pro
+	M2101K6G   // Redmi Note 10 Pro
+	M2102J20SG // Xiaomi Poco X3 Pro
+	DE2118     // OnePlus Nord N200 5G
+	EndAndroidDeviceModel
 	// OS architecture token types
 	Win64Arc
 	// Processor architecture token types
 	X64ProcArc
 	X86_64ProcArc
 	// Revision number token types
+	StartRevision
 	Revision_99_0
 	Revision_102_0
 	Revision_105_0
-	RevisionLatest
+	EndRevision
 	// Rendering engine token types
-	Gecko_99_0
-	Gecko_102_0
-	Gecko_105_0
+	StartGeckoMobile
+	GeckoMobile_99_0
+	GeckoMobile_102_0
+	GeckoMobile_105_0
+	EndGeckoMobile
+	StartGeckoPC
 	Gecko_20100101
+	EndGeckoPC
+	StartAppleWebKit
 	AppleWebKit_604_1
 	AppleWebKit_605_1_15
 	AppleWebKit_604_1_38
-	AppleWebKitLatest
+	EndAppleWebKit
 	// Additional info token types
 	KHTMLAdditionalInfo
 	// Browser name token types
+	StartFirefox
 	Firefox_99_0
 	Firefox_102_0
 	Firefox_105_0
-	FirefoxLatest
+	EndFirefox
+	StartFirefoxMobile
 	FirefoxMobile_99_0
 	FirefoxMobile_102_0
 	FirefoxMobile_105_0
-	FirefoxMobileLatest
+	EndFirefoxMobile
+	StartSafari
 	Safari_16_5_2
 	Safari_15_6_1
-	SafariLatest
+	EndSafari
+	StartSafariWebKit
 	SafariWebKit_604_1
 	SafariWebKit_605_1_15
 	SafariWebKit_604_1_38
-	SafariWebKitLatest
+	EndSafariWebKit
 	// Mobile token types
+	Mobile
+	StartMobile
 	Mobile_15E148
-	MobileLatest
+	EndMobile
 
 	TotalTokens
 )
@@ -130,6 +155,10 @@ func (t TokenType) String() string {
 		return "iPhone"
 	case IPadDevice:
 		return "iPad"
+	case MacOS_10_14_6:
+		return "Intel Mac OS X 10_14_6"
+	case MacOS_10_15_7:
+		return "Intel Mac OS X 10_15_7"
 	case MacOS_11_5:
 		return "Intel Mac OS X 11_5"
 	case MacOS_11_6_8:
@@ -150,9 +179,9 @@ func (t TokenType) String() string {
 		return "Intel Mac OS X 13_3_1"
 	case MacOS_13_5:
 		return "Intel Mac OS X 13_5"
-	case MacOS_13_5_1, MacOSLatest:
+	case MacOS_13_5_1:
 		return "Intel Mac OS X 13_5_1"
-	case WindowsNT_10_0, WindowsLatest:
+	case WindowsNT_10_0:
 		return "Windows NT 10.0"
 	case Linux:
 		return "Linux"
@@ -162,7 +191,7 @@ func (t TokenType) String() string {
 		return "CPU iPhone OS 14_8_1 like Mac OS X"
 	case IPhoneOS_15_7_8:
 		return "CPU iPhone OS 15_7_8 like Mac OS X"
-	case IPhoneOS_16_6, IPhoneOSLatest:
+	case IPhoneOS_16_6:
 		return "CPU iPhone OS 16_6 like Mac OS X"
 	case IPadOS_13_7:
 		return "CPU OS 13_7 like Mac OS X"
@@ -170,13 +199,13 @@ func (t TokenType) String() string {
 		return "CPU OS 14_8_1 like Mac OS X"
 	case IPadOS_15_7_8:
 		return "CPU OS 15_7_8 like Mac OS X"
-	case IPadOS_16_6, IPadOSLatest:
+	case IPadOS_16_6:
 		return "CPU OS 16_6 like Mac OS X"
 	case Android_11:
 		return "Android 11"
 	case Android_12:
 		return "Android 12"
-	case Android_13, AndroidLatest:
+	case Android_13:
 		return "Android 13"
 	case SM_G973F:
 		return "SM-G973F"
@@ -228,6 +257,16 @@ func (t TokenType) String() string {
 		return "Moto G Power (2021)"
 	case Moto_G_Power_2022:
 		return "Moto G Power (2022)"
+	case Redmi_Note_8_Pro:
+		return "Redmi Note 8 Pro"
+	case Redmi_Note_9_Pro:
+		return "Redmi Note 9 Pro"
+	case M2101K6G:
+		return "M2101K6G"
+	case M2102J20SG:
+		return "M2102J20SG"
+	case DE2118:
+		return "DE2118"
 	case Win64Arc:
 		return "Win64"
 	case X64ProcArc:
@@ -238,13 +277,13 @@ func (t TokenType) String() string {
 		return "rv:99.0"
 	case Revision_102_0:
 		return "rv:102.0"
-	case Revision_105_0, RevisionLatest:
+	case Revision_105_0:
 		return "rv:105.0"
-	case Gecko_99_0:
+	case GeckoMobile_99_0:
 		return "Gecko/99.0"
-	case Gecko_102_0:
+	case GeckoMobile_102_0:
 		return "Gecko/102.0"
-	case Gecko_105_0:
+	case GeckoMobile_105_0:
 		return "Gecko/105.0"
 	case Gecko_20100101:
 		return "Gecko/20100101"
@@ -252,7 +291,7 @@ func (t TokenType) String() string {
 		return "AppleWebKit/604.1"
 	case AppleWebKit_605_1_15:
 		return "AppleWebKit/605.1.15"
-	case AppleWebKit_604_1_38, AppleWebKitLatest:
+	case AppleWebKit_604_1_38:
 		return "AppleWebKit/604.1.38"
 	case KHTMLAdditionalInfo:
 		return "(KHTML, like Gecko)"
@@ -260,25 +299,27 @@ func (t TokenType) String() string {
 		return "Firefox/99.0"
 	case Firefox_102_0:
 		return "Firefox/102.0"
-	case Firefox_105_0, FirefoxLatest:
+	case Firefox_105_0:
 		return "Firefox/105.0"
 	case FirefoxMobile_99_0:
 		return "FxiOS/99.0"
 	case FirefoxMobile_102_0:
 		return "FxiOS/102.0"
-	case FirefoxMobile_105_0, FirefoxMobileLatest:
+	case FirefoxMobile_105_0:
 		return "FxiOS/105.0"
 	case Safari_16_5_2:
 		return "Version/16.5.2"
-	case Safari_15_6_1, SafariLatest:
+	case Safari_15_6_1:
 		return "Version/15.6.1"
 	case SafariWebKit_604_1:
 		return "Safari/604.1"
 	case SafariWebKit_605_1_15:
 		return "Safari/605.1.15"
-	case SafariWebKit_604_1_38, SafariWebKitLatest:
+	case SafariWebKit_604_1_38:
 		return "Safari/604.1.38"
-	case Mobile_15E148, MobileLatest:
+	case Mobile:
+		return "Mobile"
+	case Mobile_15E148:
 		return "Mobile/15E148"
 	default:
 		return ""
@@ -296,38 +337,38 @@ type UserAgent struct {
 	Version string
 }
 
-func NewToken() *Token {
-	possibilities := []TokenType{}
+func NewToken(randSeed int64) *Token {
+	possibilities := make([]TokenType, TotalTokens)
 	for i := TokenType(0); i < TotalTokens; i++ {
-		possibilities = append(possibilities, TokenType(i))
+		possibilities[i] = TokenType(i)
 	}
 
 	return &Token{
 		Possibilities: possibilities,
-		rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
+		rand:          rand.New(rand.NewSource(randSeed)),
 	}
 }
 
 func NewUserAgent(length int) *UserAgent {
 	tokens := make([]*Token, length)
-	for i := 0; i < len(tokens); i++ {
-		tokens[i] = NewToken()
+	for i := range tokens {
+		tokens[i] = NewToken(time.Now().UnixNano())
 	}
 	tokens[0].Possibilities = []TokenType{Mozilla5BrowserIdentifier}
 	Header, Client, Version := "", "", ""
 
 	for i, t := range tokens {
 		tt := t.Collapse()
-		if tt == nil {
+		if tt == 0 {
 			break
 		}
 		Header += tt.String() + " "
 
-		// if *tt == FirefoxBrowser || *tt == SafariBrowser {
+		// if tt == FirefoxBrowser || tt == SafariBrowser {
 		// 	Client = tt.String()
 		// }
 
-		if (*tt >= Firefox_99_0 && *tt <= FirefoxLatest) || (*tt >= Safari_15_6_1 && *tt <= SafariLatest) {
+		if ine(tt, StartFirefox, EndFirefox) || (tt >= StartSafari && tt <= EndSafari) {
 			Version = tt.String()
 		}
 
@@ -343,21 +384,17 @@ func NewUserAgent(length int) *UserAgent {
 	}
 }
 
-func (t *Token) Collapse() *TokenType {
+func (t *Token) Collapse() TokenType {
 	if len(t.Possibilities) == 0 {
-		return nil
+		return 0
 	}
 	t.Possibilities = []TokenType{
 		t.Possibilities[t.rand.Intn(len(t.Possibilities))],
 	}
-	return &t.Possibilities[0]
+	return t.Possibilities[0]
 }
 
 func (t *Token) Observe(collapsed, prev *Token) {
-	if prev == nil {
-		return
-	}
-
 	reduced := []TokenType{}
 	for _, currentType := range t.Possibilities {
 		for _, prevType := range prev.Possibilities {
@@ -384,16 +421,66 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		}
 		return false
 	}
-	geckoVersionLimit := func(collapsed, current TokenType) bool {
+	geckoVersionLimit := func(prev, current TokenType) bool {
 		// Gecko version must correspond to revision number
-		if collapsed == Revision_99_0 {
+		if prev == Revision_99_0 {
 			return current == Gecko_99_0
 		}
-		if collapsed == Revision_102_0 {
+		if prev == Revision_102_0 {
 			return current == Gecko_102_0
 		}
-		if collapsed == Revision_105_0 {
+		if prev == Revision_105_0 {
 			return current == Gecko_105_0
+		}
+		return false
+	}
+	firefoxVersionLimit := func(prev, current TokenType) bool {
+		// Firefox version must correspond to Gecko version
+		if prev == Gecko_99_0 {
+			return current == FirefoxMobile_99_0
+		}
+		if prev == Gecko_102_0 {
+			return current == FirefoxMobile_102_0
+		}
+		if prev == Gecko_105_0 {
+			return current == FirefoxMobile_105_0
+		}
+		return false
+	}
+	androidLimits := func(collapsed, current TokenType) bool {
+		if collapsed == Android_11 {
+			return contains(
+				current,
+				[]TokenType{
+					SM_G973F, SM_G973U, SM_A515F, SM_A515U, SM_G991B, SM_G991U,
+					SM_G998B, SM_G998U, Moto_G_Pure, Moto_G_Stylus_5G, Moto_G_Power_2021,
+					Moto_G_Power_2022, Redmi_Note_8_Pro, Redmi_Note_9_Pro, M2101K6G, M2102J20SG,
+					DE2118,
+				},
+			)
+		}
+		if collapsed == Android_12 {
+			return contains(
+				current,
+				[]TokenType{
+					SM_G973F, SM_G973U, SM_A515F, SM_A515U, SM_A536B, SM_A536U,
+					SM_G991B, SM_G991U, SM_G998B, SM_G998U, SM_S901B, SM_S901U,
+					SM_S908B, SM_S908U, Pixel_6, Pixel_6a, Pixel_6_Pro, Moto_G_Pure,
+					Moto_G_Stylus_5G, Moto_G_Stylus_5G_2022, Moto_G_5G_2022, Moto_G_Power_2022,
+					Redmi_Note_9_Pro, M2101K6G, M2102J20SG, DE2118,
+				},
+			)
+		}
+		if collapsed == Android_13 {
+			return contains(
+				current,
+				[]TokenType{
+					SM_A515F, SM_A515U, SM_A536B, SM_A536U,
+					SM_G991B, SM_G991U, SM_G998B, SM_G998U, SM_S901B, SM_S901U,
+					SM_S908B, SM_S908U, Pixel_6, Pixel_6a, Pixel_6_Pro, Pixel_7,
+					Pixel_7_Pro, Moto_G_Stylus_5G_2022, Moto_G_5G_2022, M2101K6G,
+				},
+			)
 		}
 		return false
 	}
@@ -401,8 +488,9 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	// Browser identifier must be followed by Window system, Device Type, or OS type
 	if prev == Mozilla5BrowserIdentifier {
 		return current == X11WindowSystem ||
-			(current >= MacintoshDevice && current <= IPadDevice) ||
-			(current == WindowsNT_10_0 || current == Linux)
+			in(current, MacintoshDevice, IPadDevice) ||
+			ine(current, StartWindows, EndWindows) || current == Linux ||
+			ine(current, StartAndroid, EndAndroid)
 	}
 
 	// Window system must be followed by OS (Linux)
@@ -412,15 +500,15 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 
 	// Macintosh devices should be followed by MacOS
 	if prev == MacintoshDevice {
-		return current >= MacOS_10_14_6 && current <= MacOSLatest
+		return ine(current, StartMacOS, EndMacOS)
 	}
 
 	// iPhone or iPad should be followed by corresponding OS
 	if prev == IPhoneDevice {
-		return current >= IPhoneOS_13_7 && current <= IPhoneOSLatest
+		return ine(current, StartIPhoneOS, EndIPhoneOS)
 	}
 	if prev == IPadDevice {
-		return current >= IPadOS_13_7 && current <= IPadOSLatest
+		return ine(current, StartIPadOS, EndIPadOS)
 	}
 
 	// Linux should be followed by processor architecture
@@ -428,16 +516,21 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		if collapsed == X11WindowSystem {
 			return current == X86_64ProcArc
 		}
-		return current == X86_64ProcArc || current >= Android_11 && current <= AndroidLatest
+		return current == X86_64ProcArc
 	}
 
 	// Android should be followed by device model
-	if prev >= Android_11 && prev <= AndroidLatest {
-		return current >= SM_G973F && current <= Moto_G_Power_2022
+	if in(prev, StartAndroid, EndAndroid) {
+		return current == Mobile
 	}
 
-	if prev >= SM_G973F && prev <= Moto_G_Power_2022 {
-		return current >= AppleWebKit_604_1 && current <= AppleWebKitLatest || current >= Revision_99_0 && current <= RevisionLatest
+	// Mobile should be followed by device model
+	if prev == Mobile {
+		return androidLimits(collapsed, current) || ine(current, StartAndroidDeviceModel, EndAndroidDeviceModel)
+	}
+
+	if ine(prev, StartAndroidDeviceModel, EndAndroidDeviceModel) {
+		return ine(current, StartAppleWebKit, EndAppleWebKit) || ine(current, StartRevision, EndRevision)
 	}
 
 	// Windows should be followed by OS architecture
@@ -451,34 +544,35 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	}
 
 	// Processor architecture should be followed by revision or rendering engine
-	generalCond := current >= Revision_99_0 && current <= RevisionLatest
 	if prev == X64ProcArc || prev == X86_64ProcArc {
-		if collapsed >= WindowsNT_10_0 && collapsed <= WindowsLatest {
-			return generalCond || current >= AppleWebKit_604_1 && current <= AppleWebKitLatest
+		if ine(collapsed, StartWindows, EndWindows) {
+			return ine(current, StartRevision, EndRevision) || ine(current, StartAppleWebKit, EndAppleWebKit)
 		}
-		return generalCond
+		return ine(current, StartRevision, EndRevision)
 	}
 
 	// OS should be followed by revision number or rendering engine
-	generalCond = current >= AppleWebKit_604_1 && current <= AppleWebKitLatest
-	if prev >= MacOS_10_14_6 && prev <= MacOSLatest {
-		return current >= Revision_99_0 && current <= RevisionLatest || generalCond
+	if ine(prev, StartMacOS, EndMacOS) {
+		return ine(current, StartRevision, EndRevision) || ine(current, StartAppleWebKit, EndAppleWebKit)
 	}
-	if prev >= IPhoneOS_13_7 && prev <= IPhoneOSLatest || prev >= IPadOS_13_7 && prev <= IPadOSLatest {
-		return generalCond
+	if ine(prev, StartIPhoneOS, EndIPhoneOS) || ine(prev, StartIPadOS, EndIPadOS) {
+		return ine(current, StartAppleWebKit, EndAppleWebKit)
 	}
 
 	// Revision should be followed by rendering engine
-	if prev >= Revision_99_0 && prev <= RevisionLatest {
-		if collapsed >= Android_11 && collapsed <= AndroidLatest {
-			return current >= Gecko_99_0 && current <= Gecko_105_0
+	if ine(current, StartRevision, EndRevision) {
+		if ine(collapsed, StartAndroid, EndAndroid) {
+			return ine(current, StartGeckoMobile, EndGeckoMobile)
 		}
-		return current >= Gecko_20100101 && current <= Gecko_20100101
+		return geckoVersionLimit(prev, current)
 	}
 
 	// Gecko renderer should be followed by browser
-	if prev >= Gecko_20100101 && prev <= Gecko_20100101 {
-		return current >= Firefox_99_0 && current <= FirefoxLatest
+	if ine(current, StartGeckoPC, EndGeckoPC) {
+		return ine(current, StartFirefox, EndFirefox)
+	}
+	if ine(current, StartGeckoMobile, EndGeckoMobile) {
+		return firefoxVersionLimit(prev, current)
 	}
 
 	// Apple WebKit version should be followed by additional info
@@ -505,6 +599,23 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	}
 
 	return false
+}
+
+func contains(t TokenType, s []TokenType) bool {
+	for _, e := range s {
+		if e == t {
+			return true
+		}
+	}
+	return false
+}
+
+func in(val, start, end TokenType) bool {
+	return val >= start && val <= end
+}
+
+func ine(val, start, end TokenType) bool {
+	return val > start && val < end
 }
 
 func main() {

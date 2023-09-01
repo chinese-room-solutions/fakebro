@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	tls "github.com/refraction-networking/utls"
@@ -366,7 +367,7 @@ type Agent struct {
 }
 
 // NewAgent creates a new Agent.
-// name is the name of the agent.
+// client is the name of the agent.
 // version is the version of the agent.
 // headers is the headers to send with the request.
 // tlsConf is the tls configuration to use.
@@ -378,10 +379,9 @@ func NewAgent(
 	dialTimeout time.Duration,
 ) *Agent {
 	a := Agent{client, version, tlsConf, headers, dialTimeout, nil}
-	t := http.Transport{
+	a.T = &http.Transport{
 		DialTLSContext: a.DialTLS,
 	}
-	a.T = &t
 	return &a
 }
 
