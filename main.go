@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -337,7 +338,7 @@ type UserAgent struct {
 	Version string
 }
 
-func NewToken(randSeed int64) *Token {
+func NewToken(seed int64) *Token {
 	possibilities := make([]TokenType, TotalTokens)
 	for i := TokenType(0); i < TotalTokens; i++ {
 		possibilities[i] = TokenType(i)
@@ -345,14 +346,14 @@ func NewToken(randSeed int64) *Token {
 
 	return &Token{
 		Possibilities: possibilities,
-		rand:          rand.New(rand.NewSource(randSeed)),
+		rand:          rand.New(rand.NewSource(seed)),
 	}
 }
 
-func NewUserAgent(length int) *UserAgent {
+func NewUserAgent(length int, seed int64) *UserAgent {
 	tokens := make([]*Token, length)
 	for i := range tokens {
-		tokens[i] = NewToken(time.Now().UnixNano())
+		tokens[i] = NewToken(seed)
 	}
 	tokens[0].Possibilities = []TokenType{Mozilla5BrowserIdentifier}
 	Header, Client, Version := "", "", ""
@@ -408,46 +409,7 @@ func (t *Token) Observe(collapsed, prev *Token) {
 }
 
 func isCompatible(collapsed, prev, current TokenType) bool {
-	safariVersionLimit := func(collapsed, current TokenType) bool {
-		// Safari WebKit version must correspond to Apple WebKit version
-		if collapsed == AppleWebKit_604_1 {
-			return current == SafariWebKit_604_1
-		}
-		if collapsed == AppleWebKit_604_1_38 {
-			return current == SafariWebKit_604_1_38
-		}
-		if collapsed == AppleWebKit_605_1_15 {
-			return current == SafariWebKit_605_1_15
-		}
-		return false
-	}
-	geckoVersionLimit := func(prev, current TokenType) bool {
-		// Gecko version must correspond to revision number
-		if prev == Revision_99_0 {
-			return current == Gecko_99_0
-		}
-		if prev == Revision_102_0 {
-			return current == Gecko_102_0
-		}
-		if prev == Revision_105_0 {
-			return current == Gecko_105_0
-		}
-		return false
-	}
-	firefoxVersionLimit := func(prev, current TokenType) bool {
-		// Firefox version must correspond to Gecko version
-		if prev == Gecko_99_0 {
-			return current == FirefoxMobile_99_0
-		}
-		if prev == Gecko_102_0 {
-			return current == FirefoxMobile_102_0
-		}
-		if prev == Gecko_105_0 {
-			return current == FirefoxMobile_105_0
-		}
-		return false
-	}
-	androidLimits := func(collapsed, current TokenType) bool {
+	androidDevicesLimit := func(collapsed, current TokenType) bool {
 		if collapsed == Android_11 {
 			return contains(
 				current,
@@ -484,12 +446,64 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		}
 		return false
 	}
+	safariWebKitVersionLimit := func(collapsed, current TokenType) bool {
+		// Safari WebKit version must correspond to Apple WebKit version
+		if collapsed == AppleWebKit_604_1 {
+			return current == SafariWebKit_604_1
+		}
+		if collapsed == AppleWebKit_604_1_38 {
+			return current == SafariWebKit_604_1_38
+		}
+		if collapsed == AppleWebKit_605_1_15 {
+			return current == SafariWebKit_605_1_15
+		}
+		return false
+	}
+	geckoVersionLimit := func(prev, current TokenType) bool {
+		// Gecko version must correspond to revision number
+		if prev == Revision_99_0 {
+			return current == GeckoMobile_99_0
+		}
+		if prev == Revision_102_0 {
+			return current == GeckoMobile_102_0
+		}
+		if prev == Revision_105_0 {
+			return current == GeckoMobile_105_0
+		}
+		return false
+	}
+	firefoxMobileVersionLimit := func(prev, current TokenType) bool {
+		// Firefox version must correspond to Gecko version
+		if prev == GeckoMobile_99_0 {
+			return current == Firefox_99_0
+		}
+		if prev == GeckoMobile_102_0 {
+			return current == Firefox_102_0
+		}
+		if prev == GeckoMobile_105_0 {
+			return current == Firefox_105_0
+		}
+		return false
+	}
+	firefoxPCVersionLimit := func(collapsed, current TokenType) bool {
+		// Firefox version must correspond to revision version
+		if collapsed == Revision_99_0 {
+			return current == Firefox_99_0
+		}
+		if collapsed == Revision_102_0 {
+			return current == Firefox_102_0
+		}
+		if collapsed == Revision_105_0 {
+			return current == Firefox_105_0
+		}
+		return false
+	}
 
 	// Browser identifier must be followed by Window system, Device Type, or OS type
 	if prev == Mozilla5BrowserIdentifier {
 		return current == X11WindowSystem ||
 			in(current, MacintoshDevice, IPadDevice) ||
-			ine(current, StartWindows, EndWindows) || current == Linux ||
+			ine(current, StartWindows, EndWindows) ||
 			ine(current, StartAndroid, EndAndroid)
 	}
 
@@ -526,11 +540,12 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 
 	// Mobile should be followed by device model
 	if prev == Mobile {
-		return androidLimits(collapsed, current) || ine(current, StartAndroidDeviceModel, EndAndroidDeviceModel)
+		return androidDevicesLimit(collapsed, current) || ine(current, StartAndroidDeviceModel, EndAndroidDeviceModel)
 	}
 
+	// Device model should be followed by revision number or rendering engine
 	if ine(prev, StartAndroidDeviceModel, EndAndroidDeviceModel) {
-		return ine(current, StartAppleWebKit, EndAppleWebKit) || ine(current, StartRevision, EndRevision)
+		return ine(current, StartRevision, EndRevision)
 	}
 
 	// Windows should be followed by OS architecture
@@ -545,10 +560,10 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 
 	// Processor architecture should be followed by revision or rendering engine
 	if prev == X64ProcArc || prev == X86_64ProcArc {
-		if ine(collapsed, StartWindows, EndWindows) {
-			return ine(current, StartRevision, EndRevision) || ine(current, StartAppleWebKit, EndAppleWebKit)
+		if collapsed == X11WindowSystem {
+			return ine(current, StartRevision, EndRevision)
 		}
-		return ine(current, StartRevision, EndRevision)
+		return ine(current, StartRevision, EndRevision) || ine(current, StartAppleWebKit, EndAppleWebKit)
 	}
 
 	// OS should be followed by revision number or rendering engine
@@ -560,42 +575,45 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	}
 
 	// Revision should be followed by rendering engine
-	if ine(current, StartRevision, EndRevision) {
-		if ine(collapsed, StartAndroid, EndAndroid) {
-			return ine(current, StartGeckoMobile, EndGeckoMobile)
+	if ine(prev, StartRevision, EndRevision) {
+		if collapsed == Mobile {
+			return geckoVersionLimit(prev, current)
 		}
-		return geckoVersionLimit(prev, current)
+		if contains(collapsed, []TokenType{X11WindowSystem, WindowsNT_10_0, MacintoshDevice}) {
+			return ine(current, StartGeckoPC, EndGeckoPC)
+		}
+		return ine(current, StartGeckoMobile, EndGeckoPC)
 	}
 
 	// Gecko renderer should be followed by browser
-	if ine(current, StartGeckoPC, EndGeckoPC) {
-		return ine(current, StartFirefox, EndFirefox)
+	if ine(prev, StartGeckoPC, EndGeckoPC) {
+		return firefoxPCVersionLimit(collapsed, current) || ine(current, StartFirefox, EndFirefox)
 	}
-	if ine(current, StartGeckoMobile, EndGeckoMobile) {
-		return firefoxVersionLimit(prev, current)
+	if ine(prev, StartGeckoMobile, EndGeckoMobile) {
+		return firefoxMobileVersionLimit(prev, current)
 	}
 
 	// Apple WebKit version should be followed by additional info
-	if prev >= AppleWebKit_604_1 && prev <= AppleWebKitLatest {
+	if ine(prev, StartAppleWebKit, EndAppleWebKit) {
 		return current == KHTMLAdditionalInfo
 	}
 
 	// Additional info should be followed by mobile browser or Safari
 	if prev == KHTMLAdditionalInfo {
-		return current >= FirefoxMobile_99_0 && current <= FirefoxMobileLatest || current >= Safari_15_6_1 && current <= SafariLatest
+		if collapsed == MacintoshDevice {
+			return ine(current, StartSafari, EndSafari)
+		}
+		return ine(current, StartFirefoxMobile, EndFirefoxMobile) || ine(current, StartSafari, EndSafari)
 	}
 
 	// Mobile Browser should be followed by mobile build
-	if prev >= FirefoxMobile_99_0 && prev <= FirefoxMobileLatest {
-		return current >= Mobile_15E148 && current <= MobileLatest
+	if ine(prev, StartFirefoxMobile, EndFirefoxMobile) {
+		return ine(current, StartMobile, EndMobile)
 	}
 
 	// Safari should be followed by Safari-WebKit version and mobile build should be followed by browser token
-	if (prev >= Safari_15_6_1 && prev <= SafariLatest) || (prev >= Mobile_15E148 && prev <= MobileLatest) {
-		if collapsed >= AppleWebKit_604_1 && collapsed <= AppleWebKitLatest {
-			return safariVersionLimit(collapsed, current)
-		}
-		return current >= SafariWebKit_604_1 && current <= SafariWebKitLatest
+	if ine(prev, StartSafari, EndSafari) || ine(prev, StartMobile, EndMobile) {
+		return safariWebKitVersionLimit(collapsed, current) || ine(current, StartSafariWebKit, EndSafariWebKit)
 	}
 
 	return false
@@ -619,6 +637,12 @@ func ine(val, start, end TokenType) bool {
 }
 
 func main() {
-	ua := NewUserAgent(20)
+	seed := time.Now().UnixNano()
+	fmt.Println(seed)
+	ua := NewUserAgent(20, seed)
+	// ua := NewUserAgent(20, 20)
+	// ua := NewUserAgent(20, 1693587396081377813)
+	// ua := NewUserAgent(20, 1693588302512633204)
+	// ua := NewUserAgent(20, 1693588721744517187)
 	println(ua.Header)
 }
