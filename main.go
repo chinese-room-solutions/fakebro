@@ -34,6 +34,20 @@ const (
 	MacOS_13_5
 	MacOS_13_5_1
 	EndMacOS
+	StartMacOSFirefox
+	MacOS_F_10_14
+	MacOS_F_10_15
+	MacOS_F_11_5
+	MacOS_F_11_6
+	MacOS_F_11_7
+	MacOS_F_12_3
+	MacOS_F_12_5
+	MacOS_F_12_6
+	MacOS_F_13_1
+	MacOS_F_13_2
+	MacOS_F_13_3
+	MacOS_F_13_5
+	EndMacOSFirefox
 	StartWindows
 	WindowsNT_10_0
 	EndWindows
@@ -41,14 +55,18 @@ const (
 	StartIPhoneOS
 	IPhoneOS_13_7
 	IPhoneOS_14_8_1
-	IPhoneOS_15_7_8
+	IPhoneOS_15_7_9
 	IPhoneOS_16_6
+	IPhoneOS_16_6_1
+	IPhoneOS_17_0
 	EndIPhoneOS
 	StartIPadOS
 	IPadOS_13_7
 	IPadOS_14_8_1
-	IPadOS_15_7_8
+	IPadOS_15_7_9
 	IPadOS_16_6
+	IPadOS_16_6_1
+	IPadOS_17_0
 	EndIPadOS
 	StartAndroid
 	Android_11
@@ -109,9 +127,7 @@ const (
 	Gecko_20100101
 	EndGeckoPC
 	StartAppleWebKit
-	AppleWebKit_604_1
 	AppleWebKit_605_1_15
-	AppleWebKit_604_1_38
 	EndAppleWebKit
 	// Additional info token types
 	KHTMLAdditionalInfo
@@ -131,9 +147,7 @@ const (
 	Safari_15_6_1
 	EndSafari
 	StartSafariWebKit
-	SafariWebKit_604_1
 	SafariWebKit_605_1_15
-	SafariWebKit_604_1_38
 	EndSafariWebKit
 	// Mobile token types
 	Mobile
@@ -182,6 +196,30 @@ func (t TokenType) String() string {
 		return "Intel Mac OS X 13_5"
 	case MacOS_13_5_1:
 		return "Intel Mac OS X 13_5_1"
+	case MacOS_F_10_14:
+		return "Intel Mac OS X 10.14"
+	case MacOS_F_10_15:
+		return "Intel Mac OS X 10.15"
+	case MacOS_F_11_5:
+		return "Intel Mac OS X 11.5"
+	case MacOS_F_11_6:
+		return "Intel Mac OS X 11.6"
+	case MacOS_F_11_7:
+		return "Intel Mac OS X 11.7"
+	case MacOS_F_12_3:
+		return "Intel Mac OS X 12.3"
+	case MacOS_F_12_5:
+		return "Intel Mac OS X 12.5"
+	case MacOS_F_12_6:
+		return "Intel Mac OS X 12.6"
+	case MacOS_F_13_1:
+		return "Intel Mac OS X 13.1"
+	case MacOS_F_13_2:
+		return "Intel Mac OS X 13.2"
+	case MacOS_F_13_3:
+		return "Intel Mac OS X 13.3"
+	case MacOS_F_13_5:
+		return "Intel Mac OS X 13.5"
 	case WindowsNT_10_0:
 		return "Windows NT 10.0"
 	case Linux:
@@ -190,18 +228,26 @@ func (t TokenType) String() string {
 		return "CPU iPhone OS 13_7 like Mac OS X"
 	case IPhoneOS_14_8_1:
 		return "CPU iPhone OS 14_8_1 like Mac OS X"
-	case IPhoneOS_15_7_8:
-		return "CPU iPhone OS 15_7_8 like Mac OS X"
+	case IPhoneOS_15_7_9:
+		return "CPU iPhone OS 15_7_9 like Mac OS X"
 	case IPhoneOS_16_6:
 		return "CPU iPhone OS 16_6 like Mac OS X"
+	case IPhoneOS_16_6_1:
+		return "CPU iPhone OS 16_6_1 like Mac OS X"
+	case IPhoneOS_17_0:
+		return "CPU iPhone OS 17_0 like Mac OS X"
 	case IPadOS_13_7:
 		return "CPU OS 13_7 like Mac OS X"
 	case IPadOS_14_8_1:
 		return "CPU OS 14_8_1 like Mac OS X"
-	case IPadOS_15_7_8:
-		return "CPU OS 15_7_8 like Mac OS X"
+	case IPadOS_15_7_9:
+		return "CPU OS 15_7_9 like Mac OS X"
 	case IPadOS_16_6:
 		return "CPU OS 16_6 like Mac OS X"
+	case IPadOS_16_6_1:
+		return "CPU OS 16_6_1 like Mac OS X"
+	case IPadOS_17_0:
+		return "CPU OS 17_0 like Mac OS X"
 	case Android_11:
 		return "Android 11"
 	case Android_12:
@@ -288,12 +334,8 @@ func (t TokenType) String() string {
 		return "Gecko/105.0"
 	case Gecko_20100101:
 		return "Gecko/20100101"
-	case AppleWebKit_604_1:
-		return "AppleWebKit/604.1"
 	case AppleWebKit_605_1_15:
 		return "AppleWebKit/605.1.15"
-	case AppleWebKit_604_1_38:
-		return "AppleWebKit/604.1.38"
 	case KHTMLAdditionalInfo:
 		return "(KHTML, like Gecko)"
 	case Firefox_99_0:
@@ -312,12 +354,8 @@ func (t TokenType) String() string {
 		return "Version/16.5.2"
 	case Safari_15_6_1:
 		return "Version/15.6.1"
-	case SafariWebKit_604_1:
-		return "Safari/604.1"
 	case SafariWebKit_605_1_15:
 		return "Safari/605.1.15"
-	case SafariWebKit_604_1_38:
-		return "Safari/604.1.38"
 	case Mobile:
 		return "Mobile"
 	case Mobile_15E148:
@@ -333,9 +371,8 @@ type Token struct {
 }
 
 type UserAgent struct {
-	Header  string
-	Client  string
-	Version string
+	Header string
+	Client string
 }
 
 func NewToken(seed int64) *Token {
@@ -356,7 +393,7 @@ func NewUserAgent(length int, seed int64) *UserAgent {
 		tokens[i] = NewToken(seed)
 	}
 	tokens[0].Possibilities = []TokenType{Mozilla5BrowserIdentifier}
-	Header, Client, Version := "", "", ""
+	Header, Client := "", ""
 
 	for i, t := range tokens {
 		tt := t.Collapse()
@@ -365,12 +402,10 @@ func NewUserAgent(length int, seed int64) *UserAgent {
 		}
 		Header += tt.String() + " "
 
-		// if tt == FirefoxBrowser || tt == SafariBrowser {
-		// 	Client = tt.String()
-		// }
-
-		if ine(tt, StartFirefox, EndFirefox) || (tt >= StartSafari && tt <= EndSafari) {
-			Version = tt.String()
+		if ine(tt, StartFirefoxMobile, EndFirefoxMobile) ||
+			ine(tt, StartFirefox, EndFirefox) ||
+			(tt >= StartSafari && tt <= EndSafari) {
+			Client = tt.String()
 		}
 
 		for j := i + 1; j < len(tokens); j++ {
@@ -379,9 +414,8 @@ func NewUserAgent(length int, seed int64) *UserAgent {
 	}
 
 	return &UserAgent{
-		Header:  Header,
-		Client:  Client,
-		Version: Version,
+		Header: Header,
+		Client: Client,
 	}
 }
 
@@ -446,19 +480,6 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		}
 		return false
 	}
-	safariWebKitVersionLimit := func(collapsed, current TokenType) bool {
-		// Safari WebKit version must correspond to Apple WebKit version
-		if collapsed == AppleWebKit_604_1 {
-			return current == SafariWebKit_604_1
-		}
-		if collapsed == AppleWebKit_604_1_38 {
-			return current == SafariWebKit_604_1_38
-		}
-		if collapsed == AppleWebKit_605_1_15 {
-			return current == SafariWebKit_605_1_15
-		}
-		return false
-	}
 	geckoVersionLimit := func(prev, current TokenType) bool {
 		// Gecko version must correspond to revision number
 		if prev == Revision_99_0 {
@@ -514,7 +535,7 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 
 	// Macintosh devices should be followed by MacOS
 	if prev == MacintoshDevice {
-		return ine(current, StartMacOS, EndMacOS)
+		return ine(current, StartMacOS, EndMacOS) || ine(current, StartMacOSFirefox, EndMacOSFirefox)
 	}
 
 	// iPhone or iPad should be followed by corresponding OS
@@ -540,7 +561,8 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 
 	// Mobile should be followed by device model
 	if prev == Mobile {
-		return androidDevicesLimit(collapsed, current) || ine(current, StartAndroidDeviceModel, EndAndroidDeviceModel)
+		return androidDevicesLimit(collapsed, current) ||
+			ine(current, StartAndroidDeviceModel, EndAndroidDeviceModel)
 	}
 
 	// Device model should be followed by revision number or rendering engine
@@ -563,12 +585,15 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		if collapsed == X11WindowSystem {
 			return ine(current, StartRevision, EndRevision)
 		}
-		return ine(current, StartRevision, EndRevision) || ine(current, StartAppleWebKit, EndAppleWebKit)
+		return ine(current, StartRevision, EndRevision)
 	}
 
 	// OS should be followed by revision number or rendering engine
 	if ine(prev, StartMacOS, EndMacOS) {
-		return ine(current, StartRevision, EndRevision) || ine(current, StartAppleWebKit, EndAppleWebKit)
+		return ine(current, StartAppleWebKit, EndAppleWebKit)
+	}
+	if ine(prev, StartMacOSFirefox, EndMacOSFirefox) {
+		return ine(current, StartRevision, EndRevision)
 	}
 	if ine(prev, StartIPhoneOS, EndIPhoneOS) || ine(prev, StartIPadOS, EndIPadOS) {
 		return ine(current, StartAppleWebKit, EndAppleWebKit)
@@ -612,8 +637,18 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	}
 
 	// Safari should be followed by Safari-WebKit version and mobile build should be followed by browser token
-	if ine(prev, StartSafari, EndSafari) || ine(prev, StartMobile, EndMobile) {
-		return safariWebKitVersionLimit(collapsed, current) || ine(current, StartSafariWebKit, EndSafariWebKit)
+	if ine(prev, StartSafari, EndSafari) {
+		if collapsed == IPhoneDevice || collapsed == IPadDevice {
+			return ine(current, StartMobile, EndMobile)
+		}
+		if collapsed == MacintoshDevice {
+			return !ine(current, StartMobile, EndMobile)
+		}
+		return ine(current, StartSafariWebKit, EndSafariWebKit) ||
+			ine(current, StartMobile, EndMobile)
+	}
+	if ine(prev, StartMobile, EndMobile) {
+		return ine(current, StartSafariWebKit, EndSafariWebKit)
 	}
 
 	return false
@@ -641,6 +676,12 @@ func main() {
 	fmt.Println(seed)
 	ua := NewUserAgent(20, seed)
 	// ua := NewUserAgent(20, 20)
+	// ua := NewUserAgent(20, 1695290468933462166)
+	// ua := NewUserAgent(20, 1695290138144165281)
+	// ua := NewUserAgent(20, 1695288692615889799)
+	// ua := NewUserAgent(20, 1695249310195281554)
+	// ua := NewUserAgent(20, 1695247073946548752)
+	// ua := NewUserAgent(20, 1695246322582242447)
 	// ua := NewUserAgent(20, 1693587396081377813)
 	// ua := NewUserAgent(20, 1693588302512633204)
 	// ua := NewUserAgent(20, 1693588721744517187)
