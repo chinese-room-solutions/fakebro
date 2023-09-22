@@ -1,9 +1,7 @@
-package main
+package user_agent
 
 import (
-	"fmt"
 	"math/rand"
-	"time"
 )
 
 type TokenType int
@@ -645,21 +643,4 @@ func iin(val, start, end TokenType) bool {
 
 func in(val, start, end TokenType) bool {
 	return val > start && val < end
-}
-
-func main() {
-	seed := time.Now().UnixNano()
-	fmt.Println(seed)
-	ua := NewUserAgent(20, seed)
-	// ua := NewUserAgent(20, 20)
-	// ua := NewUserAgent(20, 1695290468933462166)
-	// ua := NewUserAgent(20, 1695290138144165281)
-	// ua := NewUserAgent(20, 1695288692615889799)
-	// ua := NewUserAgent(20, 1695249310195281554)
-	// ua := NewUserAgent(20, 1695247073946548752)
-	// ua := NewUserAgent(20, 1695246322582242447)
-	// ua := NewUserAgent(20, 1693587396081377813)
-	// ua := NewUserAgent(20, 1693588302512633204)
-	// ua := NewUserAgent(20, 1693588721744517187)
-	println(ua.Header)
 }
