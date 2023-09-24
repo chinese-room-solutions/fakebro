@@ -4,56 +4,49 @@ import (
 	"context"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	tls "github.com/refraction-networking/utls"
 )
 
-type BaseTLSConfig struct {
-	Client   string
+// TLSConfig is a TLS configuration.
+type TLSConfig struct {
+	Clients  []string
 	Versions []string
 	Value    *tls.ClientHelloSpec
 }
 
-type TLSConfig struct {
-	Client  string
-	Version string
-	Value   *tls.ClientHelloSpec
+// HeadersConfig is a list of headers that are used in HTTP requests.
+type HeadersConfig struct {
+	Clients  []string
+	Versions []string
+	Value    map[string]string
 }
 
-var BaseHeaders = map[string]map[string]string{
-	"firefox": {
-		"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-		"Accept-Language":           "en-US,en;q=0.5",
-		"DNT":                       "1",
-		"Upgrade-Insecure-Requests": "1",
-		"Connection":                "keep-alive",
-		"Sec-Fetch-Dest":            "document",
-		"Sec-Fetch-Mode":            "navigate",
-		"Sec-Fetch-Site":            "none",
-		"Sec-Fetch-User":            "?1",
-	},
-}
-
-var IdentityHeadersPool = map[string][]map[string]string{
-	"firefox": {
-		{"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:%s) Gecko/20100101 Firefox/%s"},
-		{"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1; rv:%s) Gecko/20100101 Firefox/%s"},
-		{"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_6_2; rv:%s) Gecko/20100101 Firefox/%s"},
-		{"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_1_0; rv:%s) Gecko/20100101 Firefox/%s"},
-		{"User-Agent": "Mozilla/5.0 (Android; Mobile; rv:%s) Gecko/20100101 Firefox/%s"},
-		{"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/%s Mobile/15E148 Safari/605.1.15"},
-		{"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/%s Mobile/15E148 Safari/605.1.15"},
-		{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:%s) Gecko/20100101 Firefox/%s"},
-	},
-}
-
-// BaseTLSConfigs is a list of TLS configs that are used to make TLS connections.
-// Borrowed from: https://github.com/refraction-networking/utls/blob/8199306255caf0d870f69cb36f6b440b33dbf7c5/u_parrots.go
-var BaseTLSConfigs = []*BaseTLSConfig{
+// BaseHeaders is a list of headers per client.
+var BaseHeaders = []HeadersConfig{
 	{
-		Client:   "firefox",
+		Clients:  []string{"Firefox"},
+		Versions: []string{"99.0", "102.0", "105.0"},
+		Value: map[string]string{
+			"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+			"Accept-Language":           "en-US,en;q=0.5",
+			"DNT":                       "1",
+			"Upgrade-Insecure-Requests": "1",
+			"Connection":                "keep-alive",
+			"Sec-Fetch-Dest":            "document",
+			"Sec-Fetch-Mode":            "navigate",
+			"Sec-Fetch-Site":            "none",
+			"Sec-Fetch-User":            "?1",
+		},
+	},
+}
+
+// BaseTLSConfigs is a list of TLS configs per client that are used to make TLS connections.
+// Borrowed from: https://github.com/refraction-networking/utls/blob/8199306255caf0d870f69cb36f6b440b33dbf7c5/u_parrots.go
+var BaseTLSConfigs = []*TLSConfig{
+	{
+		Clients:  []string{"Firefox"},
 		Versions: []string{"99.0"},
 		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS10,
@@ -151,7 +144,7 @@ var BaseTLSConfigs = []*BaseTLSConfig{
 		},
 	},
 	{
-		Client:   "firefox",
+		Clients:  []string{"Firefox"},
 		Versions: []string{"102.0"},
 		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS10,
@@ -246,7 +239,7 @@ var BaseTLSConfigs = []*BaseTLSConfig{
 		},
 	},
 	{
-		Client:   "firefox",
+		Clients:  []string{"Firefox"},
 		Versions: []string{"105.0"},
 		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS12,

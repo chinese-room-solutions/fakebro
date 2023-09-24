@@ -2,6 +2,9 @@ package user_agent
 
 import (
 	"math/rand"
+	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
 type TokenType int
@@ -32,7 +35,7 @@ const (
 	MacOS_13_5
 	MacOS_13_5_1
 	EndMacOS
-	StartMacOSFirefox
+	StartMacOSFirefox // MacOS version displayed in Firefox on desktop
 	MacOS_F_10_14
 	MacOS_F_10_15
 	MacOS_F_11_5
@@ -221,7 +224,7 @@ func (t TokenType) String() string {
 	case WindowsNT_10_0:
 		return "(Windows NT 10.0;"
 	case Linux:
-		return "(Linux"
+		return "Linux"
 	case IPhoneOS_13_7:
 		return "CPU iPhone OS 13_7 like Mac OS X)"
 	case IPhoneOS_14_8_1:
@@ -369,14 +372,20 @@ type Token struct {
 }
 
 type UserAgent struct {
-	Header string
-	Client string
+	Header  string
+	Client  string
+	Version string
 }
 
-func NewToken(seed int64) *Token {
-	possibilities := make([]TokenType, TotalTokens)
-	for i := TokenType(0); i < TotalTokens; i++ {
-		possibilities[i] = TokenType(i)
+func NewToken(seed int64, allowedTokens ...TokenType) *Token {
+	possibilities := make([]TokenType, 0, TotalTokens)
+	if allowedTokens != nil {
+		possibilities = make([]TokenType, len(allowedTokens))
+		copy(possibilities, allowedTokens)
+	} else {
+		for i := TokenType(0); i < TotalTokens; i++ {
+			possibilities = append(possibilities, TokenType(i))
+		}
 	}
 
 	return &Token{
@@ -385,13 +394,13 @@ func NewToken(seed int64) *Token {
 	}
 }
 
-func NewUserAgent(length int, seed int64) *UserAgent {
+func NewUserAgent(length int, seed int64, allowedTokens ...TokenType) *UserAgent {
 	tokens := make([]*Token, length)
 	for i := range tokens {
-		tokens[i] = NewToken(seed)
+		tokens[i] = NewToken(seed, allowedTokens...)
 	}
 	tokens[0].Possibilities = []TokenType{Mozilla5BrowserIdentifier}
-	header, client := "", ""
+	header, client, version := "", "", ""
 
 	for i, t := range tokens {
 		tt := t.Collapse()
@@ -403,10 +412,14 @@ func NewUserAgent(length int, seed int64) *UserAgent {
 		}
 		header += tt.String()
 
-		if in(tt, StartFirefoxMobile, EndFirefoxMobile) ||
-			in(tt, StartFirefox, EndFirefox) ||
-			(tt >= StartSafari && tt <= EndSafari) {
-			client = tt.String()
+		switch {
+		case in(tt, StartFirefox, EndFirefox) || in(tt, StartFirefoxMobile, EndFirefoxMobile):
+			split := strings.Split(tt.String(), "/")
+			client = split[0]
+			version = split[1]
+		case tt >= StartSafari && tt <= EndSafari:
+			client = "Safari"
+			version = strings.Split(tt.String(), "/")[1]
 		}
 
 		for j := i + 1; j < len(tokens); j++ {
@@ -415,8 +428,9 @@ func NewUserAgent(length int, seed int64) *UserAgent {
 	}
 
 	return &UserAgent{
-		Header: header,
-		Client: client,
+		Header:  header,
+		Client:  client,
+		Version: version,
 	}
 }
 
@@ -447,18 +461,17 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	androidDevicesLimit := func(collapsed, current TokenType) bool {
 		switch collapsed {
 		case Android_11:
-			return contains(
-				current,
+			return slices.Contains(
 				[]TokenType{
 					SM_G973F, SM_G973U, SM_A515F, SM_A515U, SM_G991B, SM_G991U,
 					SM_G998B, SM_G998U, Moto_G_Pure, Moto_G_Stylus_5G, Moto_G_Power_2021,
 					Moto_G_Power_2022, Redmi_Note_8_Pro, Redmi_Note_9_Pro, M2101K6G, M2102J20SG,
 					DE2118,
 				},
+				current,
 			)
 		case Android_12:
-			return contains(
-				current,
+			return slices.Contains(
 				[]TokenType{
 					SM_G973F, SM_G973U, SM_A515F, SM_A515U, SM_A536B, SM_A536U,
 					SM_G991B, SM_G991U, SM_G998B, SM_G998U, SM_S901B, SM_S901U,
@@ -466,16 +479,17 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 					Moto_G_Stylus_5G, Moto_G_Stylus_5G_2022, Moto_G_5G_2022, Moto_G_Power_2022,
 					Redmi_Note_9_Pro, M2101K6G, M2102J20SG, DE2118,
 				},
+				current,
 			)
 		case Android_13:
-			return contains(
-				current,
+			return slices.Contains(
 				[]TokenType{
 					SM_A515F, SM_A515U, SM_A536B, SM_A536U,
 					SM_G991B, SM_G991U, SM_G998B, SM_G998U, SM_S901B, SM_S901U,
 					SM_S908B, SM_S908U, Pixel_6, Pixel_6a, Pixel_6_Pro, Pixel_7,
 					Pixel_7_Pro, Moto_G_Stylus_5G_2022, Moto_G_5G_2022, M2101K6G,
 				},
+				current,
 			)
 		default:
 			return false
@@ -584,7 +598,7 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		if collapsed == Mobile {
 			return geckoVersionLimit(prev, current)
 		}
-		if contains(collapsed, []TokenType{X11WindowSystem, WindowsNT_10_0, MacintoshDevice}) {
+		if slices.Contains([]TokenType{X11WindowSystem, WindowsNT_10_0, MacintoshDevice}, collapsed) {
 			return in(current, StartGeckoPC, EndGeckoPC)
 		}
 		return in(current, StartGeckoMobile, EndGeckoPC)
@@ -626,15 +640,6 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	default:
 		return false
 	}
-}
-
-func contains(t TokenType, s []TokenType) bool {
-	for _, e := range s {
-		if e == t {
-			return true
-		}
-	}
-	return false
 }
 
 func iin(val, start, end TokenType) bool {

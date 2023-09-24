@@ -2,51 +2,69 @@ package agent
 
 import (
 	"errors"
-	"math/rand"
+	"slices"
 	"time"
 
-	"golang.org/x/exp/maps"
+	"github.com/chinese-room-solutions/fakebro/user_agent"
 )
 
-
 type Roller struct {
-	FilteredTLSConfigs []*TLSConfig
+	AllowedTokens []user_agent.TokenType
 }
 
-var ErrUnfulfilledCondition = errors.New("no TLS configs fulfill the condition")
+var (
+	ErrUnfulfilledHeaderCondition = errors.New("no headers fulfill the condition")
+	ErrUnfulfilledTLSCondition    = errors.New("no TLS configs fulfill the condition")
+)
 
-func NewRoller(condition func(client, version string) bool) (*Roller, error) {
-	configs := []*TLSConfig{}
-	for _, c := range BaseTLSConfigs {
-		for _, v := range c.Versions {
-			if condition(c.Client, v) {
-				configs = append(configs, &TLSConfig{
-					Client:  c.Client,
-					Version: v,
-					Value:   c.Value,
-				})
+func NewRoller(condition func(t user_agent.TokenType) bool) (*Roller, error) {
+	allowedTokens := []user_agent.TokenType{}
+	if condition != nil {
+		for i := 0; i < int(user_agent.TotalTokens); i++ {
+			if condition(user_agent.TokenType(i)) {
+				allowedTokens = append(allowedTokens, user_agent.TokenType(i))
 			}
 		}
 	}
-	if len(configs) == 0 {
-		return nil, ErrUnfulfilledCondition
-	}
 
-	return &Roller{configs}, nil
+	return &Roller{
+		AllowedTokens: allowedTokens,
+	}, nil
 }
 
-func (r *Roller) Roll(network, address string, dialTimeout time.Duration) *Agent {
+func (r *Roller) Roll(seed int64, dialTimeout time.Duration) (*Agent, error) {
 	var headers map[string]string
-	i := rand.Intn(len(r.FilteredTLSConfigs))
-	maps.Copy(headers, BaseHeaders[r.FilteredTLSConfigs[i].Client])
-	j := rand.Intn(len(IdentityHeadersPool[r.FilteredTLSConfigs[i].Client]))
-	maps.Copy(headers, IdentityHeadersPool[r.FilteredTLSConfigs[i].Client][j])
+
+	ua := user_agent.NewUserAgent(20, seed, r.AllowedTokens...)
+	var tlsConfig *TLSConfig
+
+	for _, c := range BaseHeaders {
+		if slices.Contains[[]string, string](c.Clients, ua.Client) {
+			headers = c.Value
+			break
+		}
+	}
+	if headers == nil {
+		return nil, ErrUnfulfilledHeaderCondition
+	}
+	headers["User-Agent"] = ua.Header
+
+	for _, c := range BaseTLSConfigs {
+		if slices.Contains[[]string, string](c.Clients, ua.Client) &&
+			slices.Contains[[]string, string](c.Versions, ua.Version) {
+			tlsConfig = c
+			break
+		}
+	}
+	if tlsConfig == nil {
+		return nil, ErrUnfulfilledTLSCondition
+	}
 
 	return NewAgent(
-		r.FilteredTLSConfigs[i].Client,
-		r.FilteredTLSConfigs[i].Version,
-		r.FilteredTLSConfigs[i].Value,
+		ua.Client,
+		ua.Version,
+		tlsConfig.Value,
 		headers,
 		dialTimeout,
-	)
+	), nil
 }
