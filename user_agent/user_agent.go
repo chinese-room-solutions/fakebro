@@ -379,7 +379,7 @@ type UserAgent struct {
 
 func NewToken(seed int64, allowedTokens ...TokenType) *Token {
 	possibilities := make([]TokenType, 0, TotalTokens)
-	if allowedTokens != nil {
+	if allowedTokens != nil && len(allowedTokens) > 0 {
 		possibilities = make([]TokenType, len(allowedTokens))
 		copy(possibilities, allowedTokens)
 	} else {
