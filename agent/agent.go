@@ -363,7 +363,7 @@ var BaseTLSConfigs = []*TLSConfig{
 		},
 	},
 	{
-		Clients:  []string{"Safari"},
+		Clients:  []string{"Safari", "FxiOS"},
 		Versions: []string{"16.5.2", "16.6.1"},
 		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS10,

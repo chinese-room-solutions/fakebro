@@ -17,7 +17,7 @@ var (
 	ErrUnfulfilledTLSCondition    = errors.New("no TLS configs fulfill the condition")
 )
 
-func NewRoller(condition func(t user_agent.TokenType) bool) (*Roller, error) {
+func NewRoller(condition func(user_agent.TokenType) bool) (*Roller, error) {
 	allowedTokens := []user_agent.TokenType{}
 	if condition != nil {
 		for i := 0; i < int(user_agent.TotalTokens); i++ {

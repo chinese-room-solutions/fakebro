@@ -1,68 +1,36 @@
 package agent
 
-// import (
-// 	"testing"
-// 	"time"
+import (
+	"context"
+	"testing"
+	"time"
 
-// 	"github.com/stretchr/testify/require"
-// )
+	"github.com/stretchr/testify/require"
+)
 
-// // func TestRoll(t *testing.T) {
-// // 	p := ActiveAgentPool{
-// // 		Condition: func(a *Agent) bool {
-// // 			return a.Name == "firefox" && a.Version == 55
-// // 		},
-// // 		Limit: 1,
-// // 	}
-// // 	p.Roll()
-// // 	require.Len(t, p.Agents, 1)
-// // 	require.NotNil(t, p.ActiveAgents)
-// // }
+func TestPoolRollClose(t *testing.T) {
+	r, err := NewRoller(nil)
+	require.NoError(t, err)
+	p, err := NewAgentPool(1*time.Second, 3, r)
+	require.NoError(t, err)
+	require.NotNil(t, p.Agents)
+	require.Len(t, p.Agents, 3)
+	p.Close()
+	require.Nil(t, p.Agents)
+}
 
-// func TestGet(t *testing.T) {
-// 	p := &ActiveAgentPool{
-// 		Condition: func(a *Agent) bool {
-// 			return a.Name == "firefox" && a.Version == 55
-// 		},
-// 		Limit: 1,
-// 	}
-// 	_, err := p.Get()
-// 	require.Error(t, err)
-// 	require.Equal(t, ErrNilPool, err)
-
-// 	p = NewActiveAgentPool(
-// 		"tcp", "indeed.com:443", 200*time.Millisecond, 2,
-// 		func(a *Agent) bool {
-// 			return a.Name == "firefox"
-// 		},
-// 	)
-// 	agent, err := p.Get()
-// 	require.NoError(t, err)
-// 	require.NotNil(t, agent)
-// }
-
-// func TestPut(t *testing.T) {
-// 	p := NewActiveAgentPool(
-// 		"tcp", "indeed.com:443", 200*time.Millisecond, 2,
-// 		func(a *Agent) bool {
-// 			return a.Name == "firefox" && a.Version == 55
-// 		},
-// 	)
-// 	aa := NewActiveAgent(Agents[0])
-// 	err := p.Put(aa)
-// 	require.NoError(t, err)
-// 	require.Len(t, p.ActiveAgents, 1)
-// 	require.NotNil(t, p.ActiveAgents)
-// }
-
-// func TestClose(t *testing.T) {
-// 	p := NewActiveAgentPool(
-// 		"tcp", "indeed.com:443", 200*time.Millisecond, 2,
-// 		func(a *Agent) bool {
-// 			return a.Name == "firefox" && a.Version == 55
-// 		},
-// 	)
-// 	p.Close()
-// 	require.Nil(t, p.ActiveAgents)
-// 	require.Equal(t, p.Index, 0)
-// }
+func TestDo(t *testing.T) {
+	network := "tcp"
+	remoteResource := "indeed.com:443"
+	roller, err := NewRoller(nil)
+	require.NoError(t, err)
+	p, err := NewAgentPool(1*time.Second, 3, roller)
+	require.NoError(t, err)
+	err = p.Do(func(agent *Agent) error {
+		conn, err := agent.DialTLS(context.Background(), network, remoteResource)
+		require.NoError(t, err)
+		require.NotNil(t, conn)
+		return ErrBadAgent
+	})
+	require.NoError(t, err)
+}
