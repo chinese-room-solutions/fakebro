@@ -18,7 +18,9 @@ var (
 	ErrUnfulfilledTLSCondition    = errors.New("no TLS configs fulfill the condition")
 )
 
-func NewRoller(condition func(user_agent.TokenType) bool) (*Roller, error) {
+// NewRoller creates a new roller.
+// condition is a function that returns true if the token should be used.
+func NewRoller(condition func(user_agent.TokenType) bool) *Roller {
 	allowedTokens := []user_agent.TokenType{}
 	if condition != nil {
 		for i := 0; i < int(user_agent.TotalTokens); i++ {
@@ -30,10 +32,12 @@ func NewRoller(condition func(user_agent.TokenType) bool) (*Roller, error) {
 
 	return &Roller{
 		AllowedTokens: allowedTokens,
-	}, nil
+	}
 }
 
-func (r *Roller) Roll(seed int64, dialTimeout time.Duration) (*Agent, error) {
+// Roll returns a new agent with a random user agent, TLS config, and headers.
+// Panics if no user agent, TLS config, or headers fulfill the condition.
+func (r *Roller) Roll(seed int64, dialTimeout time.Duration) *Agent {
 	var ua = user_agent.NewUserAgent(20, seed, r.AllowedTokens...)
 	var headers = map[string]string{}
 	var tlsConfig *TLSConfig
@@ -45,7 +49,7 @@ func (r *Roller) Roll(seed int64, dialTimeout time.Duration) (*Agent, error) {
 		}
 	}
 	if len(headers) == 0 {
-		return nil, ErrUnfulfilledHeaderCondition
+		panic(ErrUnfulfilledHeaderCondition)
 	}
 	headers["User-Agent"] = ua.Header
 
@@ -57,7 +61,7 @@ func (r *Roller) Roll(seed int64, dialTimeout time.Duration) (*Agent, error) {
 		}
 	}
 	if tlsConfig == nil {
-		return nil, ErrUnfulfilledTLSCondition
+		panic(ErrUnfulfilledTLSCondition)
 	}
 
 	return NewAgent(
@@ -66,5 +70,5 @@ func (r *Roller) Roll(seed int64, dialTimeout time.Duration) (*Agent, error) {
 		tlsConfig.Value,
 		headers,
 		dialTimeout,
-	), nil
+	)
 }

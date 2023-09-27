@@ -11,8 +11,8 @@ import (
 func TestDialTLS(t *testing.T) {
 	network := "tcp"
 	remoteResource := "indeed.com:443"
-	roller, err := NewRoller(nil)
-	require.NoError(t, err)
+	roller := NewRoller(nil)
+	require.NotNil(t, roller)
 
 	for _, td := range []struct {
 		seed int64
@@ -25,8 +25,7 @@ func TestDialTLS(t *testing.T) {
 		},
 	} {
 		t.Run("", func(t *testing.T) {
-			agent, err := roller.Roll(td.seed, 1*time.Second)
-			require.NoError(t, err)
+			agent := roller.Roll(td.seed, 1*time.Second)
 			require.NotNil(t, agent)
 			conn, err := agent.DialTLS(context.Background(), network, remoteResource)
 			require.NoError(t, err)

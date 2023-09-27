@@ -39,6 +39,7 @@ var BaseHeaders = []HeadersConfig{
 			"Sec-Fetch-Mode":            "navigate",
 			"Sec-Fetch-Site":            "none",
 			"Sec-Fetch-User":            "?1",
+			"TE":                        "trailers",
 		},
 	},
 	{

@@ -32,7 +32,7 @@ func TestRoll(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.FormatInt(td.seed, 10), func(t *testing.T) {
-			r, err := NewRoller(func(t user_agent.TokenType) bool {
+			r := NewRoller(func(t user_agent.TokenType) bool {
 				if t > user_agent.StartSafari && t < user_agent.EndSafari && t != user_agent.Safari_16_5 ||
 					t > user_agent.StartFirefoxMobile && t < user_agent.EndFirefoxMobile ||
 					t > user_agent.StartFirefox && t < user_agent.EndFirefox && t != user_agent.Firefox_105_0 {
@@ -40,9 +40,9 @@ func TestRoll(t *testing.T) {
 				}
 				return true
 			})
-			require.NoError(t, err)
-			agent, err := r.Roll(td.seed, 1*time.Second)
-			require.NoError(t, err)
+			require.NotNil(t, r)
+			agent := r.Roll(td.seed, 1*time.Second)
+			require.NotNil(t, agent)
 			require.Equal(t, td.expectedAgent.Client, agent.Client)
 			require.Equal(t, td.expectedAgent.Version, agent.Version)
 			require.Equal(t, td.expectedAgent.TLSConfig, agent.TLSConfig)
