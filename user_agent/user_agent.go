@@ -144,8 +144,8 @@ const (
 	FirefoxMobile_105_0
 	EndFirefoxMobile
 	StartSafari
-	Safari_16_5_2
-	Safari_15_6_1
+	Safari_15_6
+	Safari_16_5
 	EndSafari
 	StartSafariWebKit
 	SafariWebKit_605_1_15
@@ -351,10 +351,10 @@ func (t TokenType) String() string {
 		return "FxiOS/102.0"
 	case FirefoxMobile_105_0:
 		return "FxiOS/105.0"
-	case Safari_16_5_2:
-		return "Version/16.5.2"
-	case Safari_15_6_1:
-		return "Version/15.6.1"
+	case Safari_15_6:
+		return "Version/15.6"
+	case Safari_16_5:
+		return "Version/16.5"
 	case SafariWebKit_605_1_15:
 		return "Safari/605.1.15"
 	case Mobile:
@@ -379,7 +379,7 @@ type UserAgent struct {
 
 func NewToken(seed int64, allowedTokens ...TokenType) *Token {
 	possibilities := make([]TokenType, 0, TotalTokens)
-	if allowedTokens != nil && len(allowedTokens) > 0 {
+	if len(allowedTokens) > 0 {
 		possibilities = make([]TokenType, len(allowedTokens))
 		copy(possibilities, allowedTokens)
 	} else {

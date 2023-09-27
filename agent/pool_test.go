@@ -24,7 +24,7 @@ func TestDo(t *testing.T) {
 	remoteResource := "indeed.com:443"
 	roller, err := NewRoller(nil)
 	require.NoError(t, err)
-	p, err := NewAgentPool(1*time.Second, 3, roller)
+	p, err := NewAgentPool(1*time.Second, 2, roller)
 	require.NoError(t, err)
 	err = p.Do(func(agent *Agent) error {
 		conn, err := agent.DialTLS(context.Background(), network, remoteResource)

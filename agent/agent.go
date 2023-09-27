@@ -26,7 +26,7 @@ type HeadersConfig struct {
 // BaseHeaders is a list of headers per client.
 var BaseHeaders = []HeadersConfig{
 	{
-		Clients:  []string{"Firefox"},
+		Clients:  []string{"Firefox", "FxiOS"},
 		Versions: []string{"99.0", "102.0", "105.0"},
 		Value: map[string]string{
 			"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -43,7 +43,7 @@ var BaseHeaders = []HeadersConfig{
 	},
 	{
 		Clients:  []string{"Safari"},
-		Versions: []string{"16.5.2", "16.6.1"},
+		Versions: []string{"15.6", "16.5"},
 		Value: map[string]string{
 			"Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 			"Accept-Language": "en-GB,en;q=0.9",
@@ -364,7 +364,7 @@ var BaseTLSConfigs = []*TLSConfig{
 	},
 	{
 		Clients:  []string{"Safari", "FxiOS"},
-		Versions: []string{"16.5.2", "16.6.1"},
+		Versions: []string{"15.6", "16.5", "99.0", "102.0", "105.0"},
 		Value: &tls.ClientHelloSpec{
 			TLSVersMin: tls.VersionTLS10,
 			TLSVersMax: tls.VersionTLS13,

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/chinese-room-solutions/fakebro/user_agent"
+	"golang.org/x/exp/maps"
 )
 
 type Roller struct {
@@ -33,18 +34,17 @@ func NewRoller(condition func(user_agent.TokenType) bool) (*Roller, error) {
 }
 
 func (r *Roller) Roll(seed int64, dialTimeout time.Duration) (*Agent, error) {
-	var headers map[string]string
-
-	ua := user_agent.NewUserAgent(20, seed, r.AllowedTokens...)
+	var ua = user_agent.NewUserAgent(20, seed, r.AllowedTokens...)
+	var headers = map[string]string{}
 	var tlsConfig *TLSConfig
 
 	for _, c := range BaseHeaders {
 		if slices.Contains[[]string, string](c.Clients, ua.Client) {
-			headers = c.Value
+			maps.Copy(headers, c.Value)
 			break
 		}
 	}
-	if headers == nil {
+	if len(headers) == 0 {
 		return nil, ErrUnfulfilledHeaderCondition
 	}
 	headers["User-Agent"] = ua.Header

@@ -28,9 +28,9 @@ func TestNewUserAgent(t *testing.T) {
 		},
 		{
 			seed:            1695290138144165281,
-			expectHeader:    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15",
+			expectHeader:    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15",
 			expectClient:    "Safari",
-			expectedVersion: "15.6.1",
+			expectedVersion: "16.5",
 		},
 		{
 			seed:            1695288692615889799,
@@ -40,9 +40,9 @@ func TestNewUserAgent(t *testing.T) {
 		},
 		{
 			seed:            1695249310195281554,
-			expectHeader:    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5.2 Mobile/15E148 Safari/605.1.15",
+			expectHeader:    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/605.1.15",
 			expectClient:    "Safari",
-			expectedVersion: "16.5.2",
+			expectedVersion: "15.6",
 		},
 		{
 			seed:            1695247073946548752,
@@ -70,9 +70,9 @@ func TestNewUserAgent(t *testing.T) {
 		},
 		{
 			seed:            1693588721744517187,
-			expectHeader:    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15",
+			expectHeader:    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15",
 			expectClient:    "Safari",
-			expectedVersion: "15.6.1",
+			expectedVersion: "16.5",
 		},
 	} {
 		t.Run(strconv.FormatInt(td.seed, 10), func(t *testing.T) {
@@ -80,6 +80,7 @@ func TestNewUserAgent(t *testing.T) {
 			require.NotNil(t, ua)
 			require.Equal(t, td.expectHeader, ua.Header)
 			require.Equal(t, td.expectClient, ua.Client)
+			require.Equal(t, td.expectedVersion, ua.Version)
 		})
 	}
 }

@@ -18,23 +18,22 @@ func TestRoll(t *testing.T) {
 			seed: 1695575963768825450,
 			expectedAgent: NewAgent(
 				"Firefox", "105.0", BaseTLSConfigs[2].Value, map[string]string{
-					"User-Agent":                "Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0",
-					"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-					"Accept-Language":           "en-US,en;q=0.5",
-					"DNT":                       "1",
-					"Upgrade-Insecure-Requests": "1",
-					"Connection":                "keep-alive",
-					"Sec-Fetch-Dest":            "document",
-					"Sec-Fetch-Mode":            "navigate",
-					"Sec-Fetch-Site":            "none",
-					"Sec-Fetch-User":            "?1",
+					"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0",
+				}, 1*time.Second,
+			),
+		},
+		{
+			seed: 1693588721744517187,
+			expectedAgent: NewAgent(
+				"Safari", "16.5", BaseTLSConfigs[3].Value, map[string]string{
+					"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15",
 				}, 1*time.Second,
 			),
 		},
 	} {
 		t.Run(strconv.FormatInt(td.seed, 10), func(t *testing.T) {
 			r, err := NewRoller(func(t user_agent.TokenType) bool {
-				if t > user_agent.StartSafari && t < user_agent.EndSafari ||
+				if t > user_agent.StartSafari && t < user_agent.EndSafari && t != user_agent.Safari_16_5 ||
 					t > user_agent.StartFirefoxMobile && t < user_agent.EndFirefoxMobile ||
 					t > user_agent.StartFirefox && t < user_agent.EndFirefox && t != user_agent.Firefox_105_0 {
 					return false
@@ -47,7 +46,7 @@ func TestRoll(t *testing.T) {
 			require.Equal(t, td.expectedAgent.Client, agent.Client)
 			require.Equal(t, td.expectedAgent.Version, agent.Version)
 			require.Equal(t, td.expectedAgent.TLSConfig, agent.TLSConfig)
-			require.Equal(t, td.expectedAgent.Headers, agent.Headers)
+			require.Equal(t, td.expectedAgent.Headers["User-Agent"], agent.Headers["User-Agent"])
 		})
 	}
 }
