@@ -20,7 +20,7 @@ func TestRoundTrip(t *testing.T) {
 		),
 	}
 
-	resp, err := client.Get("https://nl.indeed.com")
+	resp, err := client.Get("https://nl.indeed.com:443/")
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
 }

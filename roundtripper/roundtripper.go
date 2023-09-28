@@ -1,13 +1,28 @@
 package roundtripper
 
 import (
+	"bufio"
+	"context"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/chinese-room-solutions/fakebro/agent"
 	"github.com/chinese-room-solutions/fakebro/user_agent"
 	"golang.org/x/exp/maps"
+	"golang.org/x/net/http2"
+
+	"github.com/quic-go/quic-go/http3"
 )
+
+type ErrUnsupportedALPN struct {
+	ALPN string
+}
+
+func (e ErrUnsupportedALPN) Error() string {
+	return fmt.Sprintf("unsupported ALPN: %v", e.ALPN)
+}
 
 type RoundTripper struct {
 	Pool         *agent.AgentPool
@@ -48,10 +63,54 @@ func (rt *RoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 		for header, value := range headers {
 			r.Header.Set(header, value)
 		}
-		r.Header.Set("Host", r.Host)
-		resp, err = a.T.RoundTrip(r)
+		r.Header.Set("Host", strings.Split(r.Host, ":")[0])
 
-		return rt.ErrorHandler(err), err
+		conn, err := a.DialTLS(context.Background(), "tcp", r.Host)
+		if err != nil {
+			return rt.ErrorHandler(err), err
+		}
+
+		switch a.ALPN {
+		case "http/1.1":
+			r.Proto = "HTTP/1.1"
+			r.ProtoMajor = 1
+			r.ProtoMinor = 1
+
+			err := r.Write(conn)
+			if err != nil {
+				return rt.ErrorHandler(err), err
+			}
+			resp, err = http.ReadResponse(bufio.NewReader(conn), r)
+			return rt.ErrorHandler(err), err
+		case "h2", "":
+			r.Proto = "HTTP/2.0"
+			r.ProtoMajor = 2
+			r.ProtoMinor = 0
+
+			tr := http2.Transport{}
+			cConn, err := tr.NewClientConn(conn)
+			if err != nil {
+				return rt.ErrorHandler(err), err
+			}
+			resp, err = cConn.RoundTrip(r)
+			return rt.ErrorHandler(err), err
+		case "h3":
+			r.Proto = "HTTP/3.0"
+			r.ProtoMajor = 3
+			r.ProtoMinor = 0
+
+			tr := http3.RoundTripper{
+				// TLSClientConfig: a.TLSConfig,
+			}
+			_ = tr
+			return false, ErrUnsupportedALPN{ALPN: a.ALPN}
+		default:
+			return false, ErrUnsupportedALPN{ALPN: a.ALPN}
+		}
+
+		// resp, err = a.T.RoundTrip(r)
+
+		// return rt.ErrorHandler(err), err
 	})
 
 	return resp, err

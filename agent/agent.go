@@ -33,8 +33,8 @@ var BaseHeaders = []HeadersConfig{
 			"Accept-Language":           "en-US,en;q=0.5",
 			"Accept-Encoding":           "gzip, deflate, br",
 			"DNT":                       "1",
-			"Upgrade-Insecure-Requests": "1",
 			"Connection":                "keep-alive",
+			"Upgrade-Insecure-Requests": "1",
 			"Sec-Fetch-Dest":            "document",
 			"Sec-Fetch-Mode":            "navigate",
 			"Sec-Fetch-Site":            "none",
@@ -486,6 +486,7 @@ type Agent struct {
 	TLSConfig   *tls.ClientHelloSpec
 	Headers     map[string]string
 	DialTimeout time.Duration
+	ALPN        string
 	T           *http.Transport
 }
 
@@ -501,7 +502,7 @@ func NewAgent(
 	headers map[string]string,
 	dialTimeout time.Duration,
 ) *Agent {
-	a := Agent{client, version, tlsConf, headers, dialTimeout, nil}
+	a := Agent{client, version, tlsConf, headers, dialTimeout, "", nil}
 	a.T = &http.Transport{
 		DialTLSContext: a.DialTLS,
 	}
@@ -527,6 +528,7 @@ func (a *Agent) DialTLS(ctx context.Context, network, addr string) (net.Conn, er
 	if err != nil {
 		return nil, err
 	}
+	a.ALPN = conn.HandshakeState.ServerHello.AlpnProtocol
 
 	return conn, nil
 }
