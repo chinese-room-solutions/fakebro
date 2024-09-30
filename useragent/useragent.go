@@ -257,14 +257,11 @@ type UserAgent struct {
 	tokens  []*Token
 }
 
-func NewToken(seed int64, allowedTokens ...TokenType) *Token {
+func NewToken(seed int64, condition func(TokenType) bool) *Token {
 	possibilities := make([]TokenType, 0, EndChrome)
-	if len(allowedTokens) > 0 {
-		possibilities = make([]TokenType, len(allowedTokens))
-		copy(possibilities, allowedTokens)
-	} else {
-		for i := TokenType(0); i < EndChrome; i++ {
-			possibilities = append(possibilities, TokenType(i))
+	for i := TokenType(0); i < EndChrome; i++ {
+		if condition(i) {
+			possibilities = append(possibilities, i)
 		}
 	}
 
@@ -274,12 +271,14 @@ func NewToken(seed int64, allowedTokens ...TokenType) *Token {
 	}
 }
 
-func NewUserAgent(length int, seed int64, allowedTokens ...TokenType) *UserAgent {
+// NewUserAgent generates a new user agent headers with the given length and seed.
+// The condition function is used to limit the possible token types.
+func NewUserAgent(length int, seed int64, condition func(TokenType) bool) *UserAgent {
 	tokens := make([]*Token, length)
 	for i := range tokens {
-		tokens[i] = NewToken(seed, allowedTokens...)
+		tokens[i] = NewToken(seed, condition)
 	}
-	tokens[0].Possibilities = generateTokens(StartPlatform, EndPlatform)
+	tokens[0].Possibilities = filterTokens(tokens[0].Possibilities, StartPlatform, EndPlatform)
 
 	ua := &UserAgent{
 		Headers: map[string]string{
@@ -482,10 +481,13 @@ func in(token, start, end TokenType) bool {
 	return token > start && token < end
 }
 
-func generateTokens(start, end TokenType) []TokenType {
-	var filtered []TokenType
-	for i := start + 1; i < end; i++ {
-		filtered = append(filtered, i)
+func filterTokens(tokens []TokenType, start, end TokenType) []TokenType {
+	filtered := []TokenType{}
+	for _, token := range tokens {
+		if in(token, start, end) {
+			filtered = append(filtered, token)
+		}
 	}
+
 	return filtered
 }

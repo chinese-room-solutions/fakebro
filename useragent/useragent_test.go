@@ -1,24 +1,29 @@
 package useragent
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestTokenCollapse(t *testing.T) {
-	token := NewToken(42, PlatformLinux, PlatformMacOS)
+	token := NewToken(42, func(tt TokenType) bool {
+		return tt == PlatformLinux || tt == PlatformMacOS
+	})
 	collapsed := token.Collapse()
 	require.Contains(t, []TokenType{PlatformLinux, PlatformMacOS}, collapsed)
 	require.Equal(t, 1, len(token.Possibilities))
 }
 
 func TestTokenObserve(t *testing.T) {
-	collapsed := NewToken(42, PlatformLinux)
+	collapsed := NewToken(42, func(tt TokenType) bool { return tt == PlatformLinux })
 	collapsed.Collapse()
-	prev := NewToken(42, LinuxPlatformVersion_5_18_11)
+	prev := NewToken(42, func(tt TokenType) bool { return tt == LinuxPlatformVersion_5_18_11 })
 	prev.Collapse()
-	current := NewToken(42, ArchX86, ArchX64, ArchARM)
+	current := NewToken(42, func(tt TokenType) bool {
+		return tt == ArchX86 || tt == ArchX64 || tt == ArchARM
+	})
 
 	current.Observe(collapsed, prev)
 
@@ -26,14 +31,48 @@ func TestTokenObserve(t *testing.T) {
 	require.Equal(t, ArchX86, current.Possibilities[0])
 }
 
-func TestUserAgentGeneration(t *testing.T) {
-	ua := NewUserAgent(20, 42)
+func TestNewUserAgent(t *testing.T) {
+	ua := NewUserAgent(20, 42, func(tt TokenType) bool { return true })
 
 	require.NotEmpty(t, ua.Headers[SecCHUAPlatformHeader.String()])
 	require.NotEmpty(t, ua.Headers[SecCHUAPlatformVersionHeader.String()])
 	require.NotEmpty(t, ua.Headers[SecCHUAArchHeader.String()])
 	require.NotEmpty(t, ua.Headers[SecCHUABitnessHeader.String()])
 	require.NotEmpty(t, ua.Headers[UserAgentHeader.String()])
+}
+
+func TestNewUserAgentWithCondition(t *testing.T) {
+	condition := func(tt TokenType) bool {
+		allowed := []TokenType{
+			PlatformLinux,
+			LinuxPlatformVersion_5_18_11,
+			ArchX86,
+			Bit64,
+			Mozilla5BrowserIdentifier,
+			X11WindowSystem,
+			Linux,
+			X86_64ProcArch,
+			AppleWebKit_537_36,
+			KHTMLAdditionalInfo,
+			Chrome_120_0,
+			SafariWebKit_537_36,
+		}
+		return slices.Contains(allowed, tt)
+	}
+
+	ua := NewUserAgent(20, 42, condition)
+
+	expectedHeaders := map[string]string{
+		SecCHUAPlatformHeader.String():        "Linux",
+		SecCHUAPlatformVersionHeader.String(): "5.18.11",
+		SecCHUAArchHeader.String():            "x86",
+		SecCHUABitnessHeader.String():         "64",
+		UserAgentHeader.String():              "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+	}
+
+	for header, expectedValue := range expectedHeaders {
+		require.Equal(t, expectedValue, ua.Headers[header], "Mismatch in header %s", header)
+	}
 }
 
 func TestIsCompatible(t *testing.T) {
@@ -87,4 +126,28 @@ func TestIn(t *testing.T) {
 		result := in(tc.token, tc.start, tc.end)
 		require.Equal(t, tc.expected, result)
 	}
+}
+
+func TestFilterTokens(t *testing.T) {
+	tokens := []TokenType{
+		PlatformLinux,
+		LinuxPlatformVersion_5_18_11,
+		ArchX86,
+		Bit64,
+		Mozilla5BrowserIdentifier,
+		X11WindowSystem,
+		Linux,
+		X86_64ProcArch,
+		AppleWebKit_537_36,
+		KHTMLAdditionalInfo,
+		Chrome_120_0,
+		SafariWebKit_537_36,
+	}
+
+	expected := []TokenType{
+		PlatformLinux,
+	}
+
+	filtered := filterTokens(tokens, StartPlatform, EndPlatform)
+	require.Equal(t, expected, filtered)
 }
