@@ -7,6 +7,35 @@ import (
 )
 
 const (
+	_ Header = iota
+
+	SecCHUAPlatformHeader
+	SecCHUAPlatformVersionHeader
+	SecCHUAArchHeader
+	SecCHUABitnessHeader
+	UserAgentHeader
+)
+
+type Header int
+
+func (h Header) String() string {
+	switch h {
+	case SecCHUAPlatformHeader:
+		return "sec-ch-ua-platform"
+	case SecCHUAPlatformVersionHeader:
+		return "sec-ch-ua-platform-version"
+	case SecCHUAArchHeader:
+		return "sec-ch-ua-arch"
+	case SecCHUABitnessHeader:
+		return "sec-ch-ua-bitness"
+	case UserAgentHeader:
+		return "user-agent"
+	default:
+		return ""
+	}
+}
+
+const (
 	_ TokenType = iota
 
 	// Platform token types
@@ -254,11 +283,11 @@ func NewUserAgent(length int, seed int64, allowedTokens ...TokenType) *UserAgent
 
 	ua := &UserAgent{
 		Headers: map[string]string{
-			"sec-ch-ua-platform":         "",
-			"sec-ch-ua-platform-version": "",
-			"sec-ch-ua-arch":             "",
-			"sec-ch-ua-bitness":          "",
-			"user-agent":                 "",
+			SecCHUAPlatformHeader.String():        "",
+			SecCHUAPlatformVersionHeader.String(): "",
+			SecCHUAArchHeader.String():            "",
+			SecCHUABitnessHeader.String():         "",
+			UserAgentHeader.String():              "",
 		},
 		tokens: tokens,
 	}
@@ -283,15 +312,14 @@ func (ua *UserAgent) generate() {
 }
 
 func (ua *UserAgent) updateHeaders() {
-	headerKeys := []string{"sec-ch-ua-platform", "sec-ch-ua-platform-version", "sec-ch-ua-arch", "sec-ch-ua-bitness"}
 	for i, token := range ua.tokens {
 		if i < 4 {
-			ua.Headers[headerKeys[i]] = token.Possibilities[0].String()
+			ua.Headers[Header(i+1).String()] = token.Possibilities[0].String()
 		} else if i < len(ua.tokens) && len(token.Possibilities) > 0 {
-			ua.Headers["user-agent"] += fmt.Sprintf("%s ", token.Possibilities[0].String())
+			ua.Headers[UserAgentHeader.String()] += fmt.Sprintf("%s ", token.Possibilities[0].String())
 		}
 	}
-	ua.Headers["user-agent"] = strings.TrimSpace(ua.Headers["user-agent"])
+	ua.Headers[UserAgentHeader.String()] = strings.TrimSpace(ua.Headers[UserAgentHeader.String()])
 }
 
 func (t *Token) Collapse() TokenType {

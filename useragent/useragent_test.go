@@ -29,9 +29,11 @@ func TestTokenObserve(t *testing.T) {
 func TestUserAgentGeneration(t *testing.T) {
 	ua := NewUserAgent(20, 42)
 
-	if ua.Headers["user-agent"] == "" {
-		t.Error("Expected non-empty User-Agent, got empty string")
-	}
+	require.NotEmpty(t, ua.Headers[SecCHUAPlatformHeader.String()])
+	require.NotEmpty(t, ua.Headers[SecCHUAPlatformVersionHeader.String()])
+	require.NotEmpty(t, ua.Headers[SecCHUAArchHeader.String()])
+	require.NotEmpty(t, ua.Headers[SecCHUABitnessHeader.String()])
+	require.NotEmpty(t, ua.Headers[UserAgentHeader.String()])
 }
 
 func TestIsCompatible(t *testing.T) {
