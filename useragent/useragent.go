@@ -387,25 +387,25 @@ func (t *Token) Observe(collapsed, prev *Token) {
 
 func isCompatible(collapsed, prev, current TokenType) bool {
 	isPlatform := func(token TokenType) bool {
-		return in(token, StartPlatform, EndPlatform)
+		return In(token, StartPlatform, EndPlatform)
 	}
 
 	isPlatformVersion := func(token TokenType) bool {
-		return in(token, StartLinuxPlatformVersion, EndLinuxPlatformVersion) ||
-			in(token, StartMacOSPlatformVersion, EndMacOSPlatformVersion) ||
-			in(token, StartWindowsPlatformVersion, EndWindowsPlatformVersion)
+		return In(token, StartLinuxPlatformVersion, EndLinuxPlatformVersion) ||
+			In(token, StartMacOSPlatformVersion, EndMacOSPlatformVersion) ||
+			In(token, StartWindowsPlatformVersion, EndWindowsPlatformVersion)
 	}
 
 	isArch := func(token TokenType) bool {
-		return in(token, StartArch, EndArch)
+		return In(token, StartArch, EndArch)
 	}
 
 	isBitness := func(token TokenType) bool {
-		return in(token, StartBitness, EndBitness)
+		return In(token, StartBitness, EndBitness)
 	}
 
 	isChromeVersion := func(token TokenType) bool {
-		return in(token, StartChrome, EndChrome)
+		return In(token, StartChrome, EndChrome)
 	}
 
 	// First token must be a platform
@@ -417,11 +417,11 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	if isPlatform(prev) {
 		switch prev {
 		case PlatformLinux:
-			return in(current, StartLinuxPlatformVersion, EndLinuxPlatformVersion)
+			return In(current, StartLinuxPlatformVersion, EndLinuxPlatformVersion)
 		case PlatformMacOS:
-			return in(current, StartMacOSPlatformVersion, EndMacOSPlatformVersion)
+			return In(current, StartMacOSPlatformVersion, EndMacOSPlatformVersion)
 		case PlatformWindows:
-			return in(current, StartWindowsPlatformVersion, EndWindowsPlatformVersion)
+			return In(current, StartWindowsPlatformVersion, EndWindowsPlatformVersion)
 		}
 		return false
 	}
@@ -468,7 +468,7 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	}
 
 	if prev == MacintoshDevice {
-		if in(collapsed, StartMacOSPlatformVersion, EndMacOSPlatformVersion) {
+		if In(collapsed, StartMacOSPlatformVersion, EndMacOSPlatformVersion) {
 			platformVersionOffset := int(collapsed) - int(StartMacOSPlatformVersion)
 			return int(current) == int(StartMacOS)+platformVersionOffset
 		}
@@ -489,7 +489,7 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	}
 
 	// After processor architecture, we expect AppleWebKit
-	if in(prev, StartProcArch, EndProcArch) || in(prev, StartMacOS, EndMacOS) {
+	if In(prev, StartProcArch, EndProcArch) || In(prev, StartMacOS, EndMacOS) {
 		return current == AppleWebKit_537_36
 	}
 
@@ -515,14 +515,14 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	return false
 }
 
-func in(token, start, end TokenType) bool {
+func In(token, start, end TokenType) bool {
 	return token > start && token < end
 }
 
 func filterTokens(tokens []TokenType, start, end TokenType) []TokenType {
 	filtered := make([]TokenType, 0, len(tokens))
 	for _, token := range tokens {
-		if in(token, start, end) {
+		if In(token, start, end) {
 			filtered = append(filtered, token)
 		}
 	}

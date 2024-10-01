@@ -70,7 +70,7 @@ func TestNewUserAgentWithAllowedTokens(t *testing.T) {
 	}
 
 	for header, expectedValue := range expectedHeaders {
-		require.Equal(t, expectedValue, ua.Headers[header], "Mismatch in header %s", header)
+		require.Equal(t, expectedValue, ua.Headers[header], "Mismatch In header %s", header)
 	}
 }
 
@@ -127,7 +127,7 @@ func TestIn(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := in(tc.token, tc.start, tc.end)
+			result := In(tc.token, tc.start, tc.end)
 			require.Equal(t, tc.expected, result)
 		})
 	}
