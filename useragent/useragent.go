@@ -247,25 +247,55 @@ func (t TokenType) String() string {
 	}
 }
 
+type options struct {
+	AllowedTokens []TokenType
+	Condition     func(TokenType) bool
+}
+
+type Option func(*options)
+
+// WithAllowedTokens allows to limit the possible token types to the given list.
+func WithAllowedTokens(tokens ...TokenType) Option {
+	return func(o *options) {
+		o.AllowedTokens = tokens
+	}
+}
+
+// WithCondition allows to filter the possible token types based on a condition.
+func WithCondition(c func(TokenType) bool) Option {
+	return func(o *options) {
+		o.Condition = c
+	}
+}
+
 type Token struct {
 	Possibilities []TokenType
 	rand          *rand.Rand
 }
 
-type UserAgent struct {
-	Headers map[string]string
-	tokens  []*Token
-}
+func NewToken(seed int64, opts ...Option) *Token {
+	o := options{}
+	for _, opt := range opts {
+		opt(&o)
+	}
 
-func NewToken(seed int64, allowedTokens ...TokenType) *Token {
 	possibilities := make([]TokenType, 0, EndChrome)
-	if len(allowedTokens) > 0 {
-		possibilities = make([]TokenType, len(allowedTokens))
-		copy(possibilities, allowedTokens)
+	if len(o.AllowedTokens) > 0 {
+		possibilities = make([]TokenType, len(o.AllowedTokens))
+		copy(possibilities, o.AllowedTokens)
 	} else {
 		for i := TokenType(0); i < EndChrome; i++ {
 			possibilities = append(possibilities, TokenType(i))
 		}
+	}
+	if o.Condition != nil {
+		filtered := make([]TokenType, 0, len(possibilities))
+		for _, token := range possibilities {
+			if o.Condition(token) {
+				filtered = append(filtered, token)
+			}
+		}
+		possibilities = filtered
 	}
 
 	return &Token{
@@ -274,12 +304,17 @@ func NewToken(seed int64, allowedTokens ...TokenType) *Token {
 	}
 }
 
+type UserAgent struct {
+	Headers map[string]string
+	tokens  []*Token
+}
+
 // NewUserAgent generates a new user agent headers with the given length and seed.
 // The allowedTokens parameter is used to limit the possible token types.
-func NewUserAgent(length int, seed int64, allowedTokens ...TokenType) *UserAgent {
+func NewUserAgent(length int, seed int64, opts ...Option) *UserAgent {
 	tokens := make([]*Token, length)
 	for i := range tokens {
-		tokens[i] = NewToken(seed, allowedTokens...)
+		tokens[i] = NewToken(seed, opts...)
 	}
 	tokens[0].Possibilities = filterTokens(tokens[0].Possibilities, StartPlatform, EndPlatform)
 
