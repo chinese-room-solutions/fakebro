@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/chinese-room-solutions/fakebro/useragent"
+	"github.com/chinese-room-solutions/fakebro/webgl"
 )
 
 func main() {
@@ -15,4 +16,7 @@ func main() {
 	for key, value := range headers {
 		fmt.Printf("%s: %s\n", key, value)
 	}
+
+	renderer := webgl.NewWebGLRenderer("Windows", "10.0.0", 12345)
+	fmt.Println(renderer.Renderer)
 }
