@@ -17,6 +17,10 @@ func main() {
 		fmt.Printf("%s: %s\n", key, value)
 	}
 
-	renderer := webgl.NewWebGLRenderer("Windows", "10.0.0", 12345)
-	fmt.Println(renderer.Renderer)
+	renderer, err := webgl.GenerateRenderer(seed, "Linux", "6.10.5")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(renderer)
 }
