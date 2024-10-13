@@ -7,23 +7,23 @@ import (
 )
 
 func TestTokenCollapse(t *testing.T) {
-	token := NewToken(42, WithAllowedTokens(PlatformLinux, PlatformMacOS))
+	token := NewToken(42, WithAllowedTokens(PLATFORM_LINUX, PLATFORM_MACOS))
 	collapsed := token.Collapse()
-	require.Contains(t, []TokenType{PlatformLinux, PlatformMacOS}, collapsed)
+	require.Contains(t, []TokenType{PLATFORM_LINUX, PLATFORM_MACOS}, collapsed)
 	require.Equal(t, 1, len(token.Possibilities))
 }
 
 func TestTokenObserve(t *testing.T) {
-	collapsed := NewToken(42, WithAllowedTokens(PlatformLinux))
+	collapsed := NewToken(42, WithAllowedTokens(PLATFORM_LINUX))
 	collapsed.Collapse()
-	prev := NewToken(42, WithAllowedTokens(LinuxPlatformVersion_5_18_11))
+	prev := NewToken(42, WithAllowedTokens(LINUX_PLATFORM_VERSION_5_18_11))
 	prev.Collapse()
-	current := NewToken(42, WithAllowedTokens(ArchX86, ArchX64, ArchARM))
+	current := NewToken(42, WithAllowedTokens(ARCH_X86, ARCH_X64, ARCH_ARM))
 
 	current.Observe(collapsed, prev)
 
 	require.Equal(t, 1, len(current.Possibilities))
-	require.Equal(t, ArchX86, current.Possibilities[0])
+	require.Equal(t, ARCH_X86, current.Possibilities[0])
 }
 
 func TestNewUserAgent(t *testing.T) {
@@ -45,18 +45,18 @@ func TestNewUserAgent(t *testing.T) {
 
 func TestNewUserAgentWithAllowedTokens(t *testing.T) {
 	allowedTokens := []TokenType{
-		PlatformLinux,
-		LinuxPlatformVersion_5_18_11,
-		ArchX86,
-		Bit64,
-		Mozilla5BrowserIdentifier,
-		X11WindowSystem,
-		Linux,
-		X86_64ProcArch,
-		AppleWebKit_537_36,
-		KHTMLAdditionalInfo,
-		Chrome_120_0,
-		SafariWebKit_537_36,
+		PLATFORM_LINUX,
+		LINUX_PLATFORM_VERSION_5_18_11,
+		ARCH_X86,
+		BIT_64,
+		MOZILLA_5_BROWSER_IDENTIFIER,
+		X11_WINDOW_SYSTEM,
+		LINUX,
+		X86_64_PROC_ARCH,
+		APPLE_WEBKIT_537_36,
+		KHTML_ADDITIONAL_INFO,
+		CHROME_120_0,
+		SAFARI_WEBKIT_537_36,
 	}
 
 	ua := NewUserAgent(20, 42, WithAllowedTokens(allowedTokens...))
@@ -82,24 +82,24 @@ func TestIsCompatible(t *testing.T) {
 		current   TokenType
 		expected  bool
 	}{
-		{"Platform", PlatformLinux, 0, PlatformLinux, true},
-		{"Linux Platform Version", PlatformLinux, PlatformLinux, LinuxPlatformVersion_5_18_11, true},
-		{"MacOS Architecture", PlatformMacOS, MacOSPlatformVersion_13_6_6, ArchARM, true},
-		{"Windows Architecture", PlatformWindows, WindowsPlatformVersion_10_0_0, ArchX64, true},
-		{"Bitness", ArchX86, ArchX86, Bit64, true},
-		{"Mozilla Identifier", Bit64, Bit64, Mozilla5BrowserIdentifier, true},
-		{"Linux Window System", PlatformLinux, Mozilla5BrowserIdentifier, X11WindowSystem, true},
-		{"Linux OS", X11WindowSystem, X11WindowSystem, Linux, true},
-		{"MacOS Device", PlatformMacOS, MacintoshDevice, MacOS_13_6_6, true},
-		{"Windows NT", WindowsNT_10_0, WindowsNT_10_0, Win64Arch, true},
-		{"Windows Architecture", Win64Arch, Win64Arch, X64ProcArch, true},
-		{"AppleWebKit", X64ProcArch, X64ProcArch, AppleWebKit_537_36, true},
-		{"KHTML Info", AppleWebKit_537_36, AppleWebKit_537_36, KHTMLAdditionalInfo, true},
-		{"Chrome Version", KHTMLAdditionalInfo, KHTMLAdditionalInfo, Chrome_120_0, true},
-		{"Safari WebKit", Chrome_120_0, Chrome_120_0, SafariWebKit_537_36, true},
-		{"Incompatible Linux Version", PlatformLinux, PlatformLinux, MacOSPlatformVersion_13_6_6, false},
-		{"Incompatible MacOS Architecture", PlatformMacOS, MacOSPlatformVersion_13_6_6, ArchX86, false},
-		{"Incompatible Windows Architecture", PlatformWindows, WindowsPlatformVersion_10_0_0, ArchARM, false},
+		{"Platform", PLATFORM_LINUX, 0, PLATFORM_LINUX, true},
+		{"Linux Platform Version", PLATFORM_LINUX, PLATFORM_LINUX, LINUX_PLATFORM_VERSION_5_18_11, true},
+		{"MacOS Architecture", PLATFORM_MACOS, MACOS_PLATFORM_VERSION_13_6_6, ARCH_ARM, true},
+		{"Windows Architecture", PLATFORM_WINDOWS, WINDOWS_PLATFORM_VERSION_10_0_0, ARCH_X64, true},
+		{"Bitness", ARCH_X86, ARCH_X86, BIT_64, true},
+		{"Mozilla Identifier", BIT_64, BIT_64, MOZILLA_5_BROWSER_IDENTIFIER, true},
+		{"Linux Window System", PLATFORM_LINUX, MOZILLA_5_BROWSER_IDENTIFIER, X11_WINDOW_SYSTEM, true},
+		{"Linux OS", X11_WINDOW_SYSTEM, X11_WINDOW_SYSTEM, LINUX, true},
+		{"MacOS Device", PLATFORM_MACOS, MACINTOSH_DEVICE, MACOS_13_6_6, true},
+		{"Windows NT", WINDOWS_NT_10_0, WINDOWS_NT_10_0, WIN64_ARCH, true},
+		{"Windows Architecture", WIN64_ARCH, WIN64_ARCH, X64_PROC_ARCH, true},
+		{"AppleWebKit", X64_PROC_ARCH, X64_PROC_ARCH, APPLE_WEBKIT_537_36, true},
+		{"KHTML Info", APPLE_WEBKIT_537_36, APPLE_WEBKIT_537_36, KHTML_ADDITIONAL_INFO, true},
+		{"Chrome Version", KHTML_ADDITIONAL_INFO, KHTML_ADDITIONAL_INFO, CHROME_120_0, true},
+		{"Safari WebKit", CHROME_120_0, CHROME_120_0, SAFARI_WEBKIT_537_36, true},
+		{"Incompatible Linux Version", PLATFORM_LINUX, PLATFORM_LINUX, MACOS_PLATFORM_VERSION_13_6_6, false},
+		{"Incompatible MacOS Architecture", PLATFORM_MACOS, MACOS_PLATFORM_VERSION_13_6_6, ARCH_X86, false},
+		{"Incompatible Windows Architecture", PLATFORM_WINDOWS, WINDOWS_PLATFORM_VERSION_10_0_0, ARCH_ARM, false},
 	}
 
 	for _, tc := range testCases {
@@ -118,11 +118,11 @@ func TestIn(t *testing.T) {
 		end      TokenType
 		expected bool
 	}{
-		{"Platform Linux", PlatformLinux, StartPlatform, EndPlatform, true},
-		{"Start Platform", StartPlatform, StartPlatform, EndPlatform, false},
-		{"End Platform", EndPlatform, StartPlatform, EndPlatform, false},
-		{"Linux Platform Version", LinuxPlatformVersion_5_18_11, StartLinuxPlatformVersion, EndLinuxPlatformVersion, true},
-		{"Chrome Version", Chrome_120_0, StartChrome, EndChrome, true},
+		{"Platform Linux", PLATFORM_LINUX, START_PLATFORM, END_PLATFORM, true},
+		{"Start Platform", START_PLATFORM, START_PLATFORM, END_PLATFORM, false},
+		{"End Platform", END_PLATFORM, START_PLATFORM, END_PLATFORM, false},
+		{"Linux Platform Version", LINUX_PLATFORM_VERSION_5_18_11, START_LINUX_PLATFORM_VERSION, END_LINUX_PLATFORM_VERSION, true},
+		{"Chrome Version", CHROME_120_0, START_CHROME, END_CHROME, true},
 	}
 
 	for _, tc := range testCases {
@@ -135,18 +135,18 @@ func TestIn(t *testing.T) {
 
 func TestFilterTokens(t *testing.T) {
 	tokens := []TokenType{
-		PlatformLinux,
-		LinuxPlatformVersion_5_18_11,
-		ArchX86,
-		Bit64,
-		Mozilla5BrowserIdentifier,
-		X11WindowSystem,
-		Linux,
-		X86_64ProcArch,
-		AppleWebKit_537_36,
-		KHTMLAdditionalInfo,
-		Chrome_120_0,
-		SafariWebKit_537_36,
+		PLATFORM_LINUX,
+		LINUX_PLATFORM_VERSION_5_18_11,
+		ARCH_X86,
+		BIT_64,
+		MOZILLA_5_BROWSER_IDENTIFIER,
+		X11_WINDOW_SYSTEM,
+		LINUX,
+		X86_64_PROC_ARCH,
+		APPLE_WEBKIT_537_36,
+		KHTML_ADDITIONAL_INFO,
+		CHROME_120_0,
+		SAFARI_WEBKIT_537_36,
 	}
 
 	testCases := []struct {
@@ -155,10 +155,10 @@ func TestFilterTokens(t *testing.T) {
 		end      TokenType
 		expected []TokenType
 	}{
-		{"Filter Platforms", StartPlatform, EndPlatform, []TokenType{PlatformLinux}},
-		{"Filter Linux Platform Versions", StartLinuxPlatformVersion, EndLinuxPlatformVersion, []TokenType{LinuxPlatformVersion_5_18_11}},
-		{"Filter Architectures", StartArch, EndArch, []TokenType{ArchX86}},
-		{"Filter Chrome Versions", StartChrome, EndChrome, []TokenType{Chrome_120_0}},
+		{"Filter Platforms", START_PLATFORM, END_PLATFORM, []TokenType{PLATFORM_LINUX}},
+		{"Filter Linux Platform Versions", START_LINUX_PLATFORM_VERSION, END_LINUX_PLATFORM_VERSION, []TokenType{LINUX_PLATFORM_VERSION_5_18_11}},
+		{"Filter Architectures", START_ARCH, END_ARCH, []TokenType{ARCH_X86}},
+		{"Filter Chrome Versions", START_CHROME, END_CHROME, []TokenType{CHROME_120_0}},
 	}
 
 	for _, tc := range testCases {
@@ -201,18 +201,18 @@ func BenchmarkNewUserAgent(b *testing.B) {
 			length: 20,
 			seed:   42,
 			allowedTokens: []TokenType{
-				PlatformLinux,
-				LinuxPlatformVersion_5_18_11,
-				ArchX86,
-				Bit64,
-				Mozilla5BrowserIdentifier,
-				X11WindowSystem,
-				Linux,
-				X86_64ProcArch,
-				AppleWebKit_537_36,
-				KHTMLAdditionalInfo,
-				Chrome_120_0,
-				SafariWebKit_537_36,
+				PLATFORM_LINUX,
+				LINUX_PLATFORM_VERSION_5_18_11,
+				ARCH_X86,
+				BIT_64,
+				MOZILLA_5_BROWSER_IDENTIFIER,
+				X11_WINDOW_SYSTEM,
+				LINUX,
+				X86_64_PROC_ARCH,
+				APPLE_WEBKIT_537_36,
+				KHTML_ADDITIONAL_INFO,
+				CHROME_120_0,
+				SAFARI_WEBKIT_537_36,
 			},
 		},
 	}

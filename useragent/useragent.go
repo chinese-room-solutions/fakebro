@@ -39,208 +39,208 @@ const (
 	_ TokenType = iota
 
 	// Platform token types
-	StartPlatform
-	PlatformLinux
-	PlatformMacOS
-	PlatformWindows
-	EndPlatform
+	START_PLATFORM
+	PLATFORM_LINUX
+	PLATFORM_MACOS
+	PLATFORM_WINDOWS
+	END_PLATFORM
 
 	// Platform version token types
-	StartLinuxPlatformVersion
-	LinuxPlatformVersion_5_18_11
-	LinuxPlatformVersion_5_19_15
-	LinuxPlatformVersion_6_7_11
-	LinuxPlatformVersion_6_8_12
-	LinuxPlatformVersion_6_9_10
-	LinuxPlatformVersion_6_10_11
-	EndLinuxPlatformVersion
+	START_LINUX_PLATFORM_VERSION
+	LINUX_PLATFORM_VERSION_5_18_11
+	LINUX_PLATFORM_VERSION_5_19_15
+	LINUX_PLATFORM_VERSION_6_7_11
+	LINUX_PLATFORM_VERSION_6_8_12
+	LINUX_PLATFORM_VERSION_6_9_10
+	LINUX_PLATFORM_VERSION_6_10_11
+	END_LINUX_PLATFORM_VERSION
 
-	StartMacOSPlatformVersion
-	MacOSPlatformVersion_13_6_6
-	MacOSPlatformVersion_13_7
-	MacOSPlatformVersion_14_4_1
-	MacOSPlatformVersion_14_6_1
-	MacOSPlatformVersion_14_7
-	MacOSPlatformVersion_15_0
-	EndMacOSPlatformVersion
+	START_MACOS_PLATFORM_VERSION
+	MACOS_PLATFORM_VERSION_13_6_6
+	MACOS_PLATFORM_VERSION_13_7
+	MACOS_PLATFORM_VERSION_14_4_1
+	MACOS_PLATFORM_VERSION_14_6_1
+	MACOS_PLATFORM_VERSION_14_7
+	MACOS_PLATFORM_VERSION_15_0
+	END_MACOS_PLATFORM_VERSION
 
-	StartWindowsPlatformVersion
-	WindowsPlatformVersion_10_0_0
-	WindowsPlatformVersion_14_0_0
-	EndWindowsPlatformVersion
+	START_WINDOWS_PLATFORM_VERSION
+	WINDOWS_PLATFORM_VERSION_10_0_0
+	WINDOWS_PLATFORM_VERSION_14_0_0
+	END_WINDOWS_PLATFORM_VERSION
 
 	// Architecture token types
-	StartArch
-	ArchX86
-	ArchX64
-	ArchARM
-	EndArch
+	START_ARCH
+	ARCH_X86
+	ARCH_X64
+	ARCH_ARM
+	END_ARCH
 
 	// Bitness token types
-	StartBitness
-	Bit64
-	EndBitness
+	START_BITNESS
+	BIT_64
+	END_BITNESS
 
 	// Browser identifier token types
-	Mozilla5BrowserIdentifier
+	MOZILLA_5_BROWSER_IDENTIFIER
 
 	// Window system token types
-	X11WindowSystem
+	X11_WINDOW_SYSTEM
 
 	// Device type token types
-	MacintoshDevice
+	MACINTOSH_DEVICE
 
 	// OS token types
-	Linux
+	LINUX
 
-	StartMacOS
-	MacOS_13_6_6
-	MacOS_13_7
-	MacOS_14_4_1
-	MacOS_14_6_1
-	MacOS_14_7
-	MacOS_15_0
-	EndMacOS
+	START_MACOS
+	MACOS_13_6_6
+	MACOS_13_7
+	MACOS_14_4_1
+	MACOS_14_6_1
+	MACOS_14_7
+	MACOS_15_0
+	END_MACOS
 
-	StartWindows
-	WindowsNT_10_0
-	EndWindows
+	START_WINDOWS
+	WINDOWS_NT_10_0
+	END_WINDOWS
 
 	// OS bitness token types
-	Win64Arch
+	WIN64_ARCH
 
 	// Processor architecture token types
-	StartProcArch
-	X64ProcArch
-	X86_64ProcArch
-	EndProcArch
+	START_PROC_ARCH
+	X64_PROC_ARCH
+	X86_64_PROC_ARCH
+	END_PROC_ARCH
 
 	// Rendering engine token types
-	StartAppleWebKit
-	AppleWebKit_537_36
-	EndAppleWebKit
+	START_APPLE_WEBKIT
+	APPLE_WEBKIT_537_36
+	END_APPLE_WEBKIT
 
-	StartSafariWebKit
-	SafariWebKit_537_36
-	EndSafariWebKit
+	START_SAFARI_WEBKIT
+	SAFARI_WEBKIT_537_36
+	END_SAFARI_WEBKIT
 
 	// Additional info token types
-	KHTMLAdditionalInfo
+	KHTML_ADDITIONAL_INFO
 
 	// Browser name token types
-	StartChrome
-	Chrome_120_0
-	Chrome_121_0
-	Chrome_122_0
-	Chrome_123_0
-	Chrome_124_0
-	Chrome_125_0
-	Chrome_126_0
-	Chrome_127_0
-	Chrome_128_0
-	Chrome_129_0
-	EndChrome
+	START_CHROME
+	CHROME_120_0
+	CHROME_121_0
+	CHROME_122_0
+	CHROME_123_0
+	CHROME_124_0
+	CHROME_125_0
+	CHROME_126_0
+	CHROME_127_0
+	CHROME_128_0
+	CHROME_129_0
+	END_CHROME
 )
 
 type TokenType int
 
 func (t TokenType) String() string {
 	switch t {
-	case PlatformLinux:
+	case PLATFORM_LINUX:
 		return "Linux"
-	case PlatformMacOS:
+	case PLATFORM_MACOS:
 		return "macOS"
-	case PlatformWindows:
+	case PLATFORM_WINDOWS:
 		return "Windows"
-	case LinuxPlatformVersion_5_18_11:
+	case LINUX_PLATFORM_VERSION_5_18_11:
 		return "5.18.11"
-	case LinuxPlatformVersion_5_19_15:
+	case LINUX_PLATFORM_VERSION_5_19_15:
 		return "5.19.15"
-	case LinuxPlatformVersion_6_7_11:
+	case LINUX_PLATFORM_VERSION_6_7_11:
 		return "6.7.11"
-	case LinuxPlatformVersion_6_8_12:
+	case LINUX_PLATFORM_VERSION_6_8_12:
 		return "6.8.12"
-	case LinuxPlatformVersion_6_9_10:
+	case LINUX_PLATFORM_VERSION_6_9_10:
 		return "6.9.10"
-	case LinuxPlatformVersion_6_10_11:
+	case LINUX_PLATFORM_VERSION_6_10_11:
 		return "6.10.11"
-	case MacOSPlatformVersion_13_6_6:
+	case MACOS_PLATFORM_VERSION_13_6_6:
 		return "13.6.6"
-	case MacOSPlatformVersion_13_7:
+	case MACOS_PLATFORM_VERSION_13_7:
 		return "13.7"
-	case MacOSPlatformVersion_14_4_1:
+	case MACOS_PLATFORM_VERSION_14_4_1:
 		return "14.4.1"
-	case MacOSPlatformVersion_14_6_1:
+	case MACOS_PLATFORM_VERSION_14_6_1:
 		return "14.6.1"
-	case MacOSPlatformVersion_14_7:
+	case MACOS_PLATFORM_VERSION_14_7:
 		return "14.7"
-	case MacOSPlatformVersion_15_0:
+	case MACOS_PLATFORM_VERSION_15_0:
 		return "15.0"
-	case WindowsPlatformVersion_10_0_0:
+	case WINDOWS_PLATFORM_VERSION_10_0_0:
 		return "10.0.0"
-	case WindowsPlatformVersion_14_0_0:
+	case WINDOWS_PLATFORM_VERSION_14_0_0:
 		return "14.0.0"
-	case ArchX86:
+	case ARCH_X86:
 		return "x86"
-	case ArchX64:
+	case ARCH_X64:
 		return "x64"
-	case ArchARM:
+	case ARCH_ARM:
 		return "arm"
-	case Bit64:
+	case BIT_64:
 		return "64"
-	case Mozilla5BrowserIdentifier:
+	case MOZILLA_5_BROWSER_IDENTIFIER:
 		return "Mozilla/5.0"
-	case X11WindowSystem:
+	case X11_WINDOW_SYSTEM:
 		return "(X11;"
-	case MacintoshDevice:
+	case MACINTOSH_DEVICE:
 		return "(Macintosh;"
-	case Linux:
+	case LINUX:
 		return "Linux"
-	case MacOS_13_6_6:
+	case MACOS_13_6_6:
 		return "Intel Mac OS X 13_6_6)"
-	case MacOS_13_7:
+	case MACOS_13_7:
 		return "Intel Mac OS X 13_7)"
-	case MacOS_14_4_1:
+	case MACOS_14_4_1:
 		return "Intel Mac OS X 14_4_1)"
-	case MacOS_14_6_1:
+	case MACOS_14_6_1:
 		return "Intel Mac OS X 14_6_1)"
-	case MacOS_14_7:
+	case MACOS_14_7:
 		return "Intel Mac OS X 14_7)"
-	case MacOS_15_0:
+	case MACOS_15_0:
 		return "Intel Mac OS X 15_0)"
-	case WindowsNT_10_0:
+	case WINDOWS_NT_10_0:
 		return "(Windows NT 10.0;"
-	case Win64Arch:
+	case WIN64_ARCH:
 		return "Win64;"
-	case X64ProcArch:
+	case X64_PROC_ARCH:
 		return "x64)"
-	case X86_64ProcArch:
+	case X86_64_PROC_ARCH:
 		return "x86_64)"
-	case AppleWebKit_537_36:
+	case APPLE_WEBKIT_537_36:
 		return "AppleWebKit/537.36"
-	case KHTMLAdditionalInfo:
+	case KHTML_ADDITIONAL_INFO:
 		return "(KHTML, like Gecko)"
-	case SafariWebKit_537_36:
+	case SAFARI_WEBKIT_537_36:
 		return "Safari/537.36"
-	case Chrome_120_0:
+	case CHROME_120_0:
 		return "Chrome/120.0.0.0"
-	case Chrome_121_0:
+	case CHROME_121_0:
 		return "Chrome/121.0.0.0"
-	case Chrome_122_0:
+	case CHROME_122_0:
 		return "Chrome/122.0.0.0"
-	case Chrome_123_0:
+	case CHROME_123_0:
 		return "Chrome/123.0.0.0"
-	case Chrome_124_0:
+	case CHROME_124_0:
 		return "Chrome/124.0.0.0"
-	case Chrome_125_0:
+	case CHROME_125_0:
 		return "Chrome/125.0.0.0"
-	case Chrome_126_0:
+	case CHROME_126_0:
 		return "Chrome/126.0.0.0"
-	case Chrome_127_0:
+	case CHROME_127_0:
 		return "Chrome/127.0.0.0"
-	case Chrome_128_0:
+	case CHROME_128_0:
 		return "Chrome/128.0.0.0"
-	case Chrome_129_0:
+	case CHROME_129_0:
 		return "Chrome/129.0.0.0"
 	default:
 		return ""
@@ -279,12 +279,12 @@ func NewToken(seed int64, opts ...Option) *Token {
 		opt(&o)
 	}
 
-	possibilities := make([]TokenType, 0, EndChrome)
+	possibilities := make([]TokenType, 0, END_CHROME)
 	if len(o.AllowedTokens) > 0 {
 		possibilities = make([]TokenType, len(o.AllowedTokens))
 		copy(possibilities, o.AllowedTokens)
 	} else {
-		for i := TokenType(0); i < EndChrome; i++ {
+		for i := TokenType(0); i < END_CHROME; i++ {
 			possibilities = append(possibilities, TokenType(i))
 		}
 	}
@@ -316,7 +316,7 @@ func NewUserAgent(length int, seed int64, opts ...Option) *UserAgent {
 	for i := range tokens {
 		tokens[i] = NewToken(seed, opts...)
 	}
-	tokens[0].Possibilities = filterTokens(tokens[0].Possibilities, StartPlatform, EndPlatform)
+	tokens[0].Possibilities = filterTokens(tokens[0].Possibilities, START_PLATFORM, END_PLATFORM)
 
 	ua := &UserAgent{
 		Headers: map[string]string{
@@ -387,25 +387,25 @@ func (t *Token) Observe(collapsed, prev *Token) {
 
 func isCompatible(collapsed, prev, current TokenType) bool {
 	isPlatform := func(token TokenType) bool {
-		return In(token, StartPlatform, EndPlatform)
+		return In(token, START_PLATFORM, END_PLATFORM)
 	}
 
 	isPlatformVersion := func(token TokenType) bool {
-		return In(token, StartLinuxPlatformVersion, EndLinuxPlatformVersion) ||
-			In(token, StartMacOSPlatformVersion, EndMacOSPlatformVersion) ||
-			In(token, StartWindowsPlatformVersion, EndWindowsPlatformVersion)
+		return In(token, START_LINUX_PLATFORM_VERSION, END_LINUX_PLATFORM_VERSION) ||
+			In(token, START_MACOS_PLATFORM_VERSION, END_MACOS_PLATFORM_VERSION) ||
+			In(token, START_WINDOWS_PLATFORM_VERSION, END_WINDOWS_PLATFORM_VERSION)
 	}
 
 	isArch := func(token TokenType) bool {
-		return In(token, StartArch, EndArch)
+		return In(token, START_ARCH, END_ARCH)
 	}
 
 	isBitness := func(token TokenType) bool {
-		return In(token, StartBitness, EndBitness)
+		return In(token, START_BITNESS, END_BITNESS)
 	}
 
 	isChromeVersion := func(token TokenType) bool {
-		return In(token, StartChrome, EndChrome)
+		return In(token, START_CHROME, END_CHROME)
 	}
 
 	// First token must be a platform
@@ -416,12 +416,12 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	// Second token must be a platform version corresponding to the platform
 	if isPlatform(prev) {
 		switch prev {
-		case PlatformLinux:
-			return In(current, StartLinuxPlatformVersion, EndLinuxPlatformVersion)
-		case PlatformMacOS:
-			return In(current, StartMacOSPlatformVersion, EndMacOSPlatformVersion)
-		case PlatformWindows:
-			return In(current, StartWindowsPlatformVersion, EndWindowsPlatformVersion)
+		case PLATFORM_LINUX:
+			return In(current, START_LINUX_PLATFORM_VERSION, END_LINUX_PLATFORM_VERSION)
+		case PLATFORM_MACOS:
+			return In(current, START_MACOS_PLATFORM_VERSION, END_MACOS_PLATFORM_VERSION)
+		case PLATFORM_WINDOWS:
+			return In(current, START_WINDOWS_PLATFORM_VERSION, END_WINDOWS_PLATFORM_VERSION)
 		}
 		return false
 	}
@@ -429,12 +429,12 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 	// Third token must be an architecture
 	if isPlatformVersion(prev) {
 		switch collapsed {
-		case PlatformLinux:
-			return current == ArchX86
-		case PlatformWindows:
-			return current == ArchX64
-		case PlatformMacOS:
-			return current == ArchARM
+		case PLATFORM_LINUX:
+			return current == ARCH_X86
+		case PLATFORM_WINDOWS:
+			return current == ARCH_X64
+		case PLATFORM_MACOS:
+			return current == ARCH_ARM
 		}
 		return true
 	}
@@ -444,69 +444,69 @@ func isCompatible(collapsed, prev, current TokenType) bool {
 		return isBitness(current)
 	}
 
-	// Fifth token must be Mozilla5BrowserIdentifier
+	// Fifth token must be MOZILLA_5_BROWSER_IDENTIFIER
 	if isBitness(prev) {
-		return current == Mozilla5BrowserIdentifier
+		return current == MOZILLA_5_BROWSER_IDENTIFIER
 	}
 
-	// After Mozilla5BrowserIdentifier, we expect the window system or device type or OS
-	if prev == Mozilla5BrowserIdentifier {
+	// After MOZILLA_5_BROWSER_IDENTIFIER, we expect the window system or device type or OS
+	if prev == MOZILLA_5_BROWSER_IDENTIFIER {
 		switch collapsed {
-		case PlatformLinux:
-			return current == X11WindowSystem
-		case PlatformMacOS:
-			return current == MacintoshDevice
-		case PlatformWindows:
-			return current == WindowsNT_10_0
+		case PLATFORM_LINUX:
+			return current == X11_WINDOW_SYSTEM
+		case PLATFORM_MACOS:
+			return current == MACINTOSH_DEVICE
+		case PLATFORM_WINDOWS:
+			return current == WINDOWS_NT_10_0
 		}
 		return true
 	}
 
 	// After window system or device type, we expect the OS
-	if prev == X11WindowSystem {
-		return current == Linux
+	if prev == X11_WINDOW_SYSTEM {
+		return current == LINUX
 	}
 
-	if prev == MacintoshDevice {
-		if In(collapsed, StartMacOSPlatformVersion, EndMacOSPlatformVersion) {
-			platformVersionOffset := int(collapsed) - int(StartMacOSPlatformVersion)
-			return int(current) == int(StartMacOS)+platformVersionOffset
+	if prev == MACINTOSH_DEVICE {
+		if In(collapsed, START_MACOS_PLATFORM_VERSION, END_MACOS_PLATFORM_VERSION) {
+			platformVersionOffset := int(collapsed) - int(START_MACOS_PLATFORM_VERSION)
+			return int(current) == int(START_MACOS)+platformVersionOffset
 		}
 		return true
 	}
 
-	if prev == WindowsNT_10_0 {
-		return current == Win64Arch
+	if prev == WINDOWS_NT_10_0 {
+		return current == WIN64_ARCH
 	}
 
 	// After OS, we expect the processor architecture
-	if prev == Linux {
-		return current == X86_64ProcArch
+	if prev == LINUX {
+		return current == X86_64_PROC_ARCH
 	}
 
-	if prev == Win64Arch {
-		return current == X64ProcArch
+	if prev == WIN64_ARCH {
+		return current == X64_PROC_ARCH
 	}
 
 	// After processor architecture, we expect AppleWebKit
-	if In(prev, StartProcArch, EndProcArch) || In(prev, StartMacOS, EndMacOS) {
-		return current == AppleWebKit_537_36
+	if In(prev, START_PROC_ARCH, END_PROC_ARCH) || In(prev, START_MACOS, END_MACOS) {
+		return current == APPLE_WEBKIT_537_36
 	}
 
 	// After AppleWebKit, we expect KHTML additional info
-	if prev == AppleWebKit_537_36 {
-		return current == KHTMLAdditionalInfo
+	if prev == APPLE_WEBKIT_537_36 {
+		return current == KHTML_ADDITIONAL_INFO
 	}
 
 	// After KHTML, we expect Chrome version
-	if prev == KHTMLAdditionalInfo {
+	if prev == KHTML_ADDITIONAL_INFO {
 		return isChromeVersion(current)
 	}
 
 	// After Chrome version, we expect SafariWebKit
 	if isChromeVersion(prev) {
-		if collapsed == AppleWebKit_537_36 {
-			return current == SafariWebKit_537_36
+		if collapsed == APPLE_WEBKIT_537_36 {
+			return current == SAFARI_WEBKIT_537_36
 		}
 		return true
 	}
